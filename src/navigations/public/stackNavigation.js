@@ -1,6 +1,5 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import { Dashboard, ForgotPassword, LoginScreen } from '../../screens';
-import { NavigationContainer } from '@react-navigation/native';
 
 const Stack = createStackNavigator();
 

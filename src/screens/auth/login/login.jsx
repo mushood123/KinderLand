@@ -15,7 +15,7 @@ export const LoginScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const navigate = useNavigation();
+  const navigation = useNavigation();
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -47,12 +47,12 @@ export const LoginScreen = () => {
     if (isValid) {
       console.log('Username:', email);
       console.log('Password:', password);
-      navigate.navigate('Dashboard')
+      navigation.navigate('Dashboard')
     }
   };
 
   const handleForgotPassword = () => {
-    navigate.navigate('Forgot Password')
+    navigation.navigate('Forgot Password')
     console.log('Forgot password pressed');
   };
 

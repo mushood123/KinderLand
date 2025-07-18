@@ -5,11 +5,26 @@ import { orders } from './data';
 import { OrderUpdateModal } from '../../../components';
 import { DeleteConfirmationModal } from '../../../components';
 import { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 
 export const Home = () => {
-    const [modalVisible, setModalVisible] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+    const navigation = useNavigation();
+
+    const handleEdit = (item) => {
+        console.log(`Edit order ${item.poNumber}`);
+        setSelectedOrder(item);
+        console.log('order data', item)
+        navigation.navigate('Edit Order');
+    };
+
+    const handleDelete = (item) => {
+        console.log(`Delete order ${item.poNumber}`);
+        setDeleteModalVisible(true);
+        setSelectedOrder(item);
+    }
+
     return (
         <>
             <FlatList
@@ -25,19 +40,10 @@ export const Home = () => {
                         date={item.date}
                         shippingAddress={item.shippingAddress}
                         status={item.status}
-                        onEdit={() => { console.log(`Edit order ${item.poNumber}`); setSelectedOrder(item); setModalVisible(true); console.log('order data', item) }}
-                        onDelete={() => { console.log(`Delete order ${item.poNumber}`); setDeleteModalVisible(true); setSelectedOrder(item) }}
+                        onEdit={() => handleEdit(item)}
+                        onDelete={() => handleDelete(item)}
                     />
                 )}
-            /> ?
-            <OrderUpdateModal
-                visible={modalVisible}
-                orderData={selectedOrder}
-                onClose={() => setModalVisible(false)}
-                onUpdate={(updatedOrder) => {
-                    console.log('Updated Order:', updatedOrder);
-                    setModalVisible(false);
-                }}
             />
             <DeleteConfirmationModal
                 id={selectedOrder?.poNumber}
