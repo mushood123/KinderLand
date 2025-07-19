@@ -1,0 +1,43 @@
+import { SVGVenettini } from "../../../assets";
+export const notifications = [
+  {
+    id: '1',
+    date: '2025-01-19',
+    time: '10:30 AM',
+    title: 'New Order Received',
+    description: 'You have received a new order #12345 from John Doe. Please review and process the order.',
+    logo: <SVGVenettini />,
+    logoBg: '#F3E8FF',
+    isRead: false,
+  },
+  {
+    id: '2',
+    date: '2025-01-19',
+    time: '09:15 AM',
+    title: 'Message from Support',
+    description: 'Your support ticket has been updated. Our team has provided a solution to your query.',
+    logo: <SVGVenettini />,
+    logoBg: '#ECFDF5',
+    isRead: true,
+  },
+  {
+    id: '3',
+    date: '2025-01-18',
+    time: '04:45 PM',
+    title: 'Payment Successful',
+    description: 'Your payment of $149.99 has been processed successfully. Thank you for your purchase!',
+    logo: <SVGVenettini />,
+    logoBg: '#EFF6FF',
+    isRead: true,
+  },
+  {
+    id: '4',
+    date: '2025-01-18',
+    time: '02:20 PM',
+    title: 'System Maintenance',
+    description: 'Scheduled maintenance will occur tonight from 11 PM to 2 AM. Some features may be unavailable.',
+    logo: <SVGVenettini />,
+    logoBg: '#FFFBEB',
+    isRead: false,
+  },
+];

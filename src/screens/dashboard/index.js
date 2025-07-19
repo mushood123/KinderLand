@@ -6,7 +6,10 @@ import { Customers } from './customers';
 import { Reports } from './reports';
 import { Products } from './products';
 import { EditOrder } from './editOrder';
-import { SVGCustomers, SVGHome, SVGProducts, SVGReports } from '../../assets';
+import { SizeQuantity } from './sizeQuantity';
+import { AddOrder } from './addOrder';
+import { Notifications } from './notifications';
+import { SVGCustomers, SVGHome, SVGProducts, SVGReports, SVGAdd } from '../../assets';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -24,6 +27,18 @@ const HomeStack = () => {
             <Stack.Screen
                 name="Edit Order"
                 component={EditOrder}
+                options={{
+                    headerShown: true
+                }} />
+            <Stack.Screen
+                name="Size Quantity"
+                component={SizeQuantity}
+                options={{
+                    headerShown: true
+                }} />
+            <Stack.Screen
+                name="Notifications"
+                component={Notifications}
                 options={{
                     headerShown: true
                 }} />
@@ -47,6 +62,13 @@ export const Dashboard = () => {
                 component={Customers}
                 options={{
                     tabBarIcon: ({ focused }) => <SVGCustomers size="30px" />,
+                }}
+            />
+            <Tab.Screen
+                name="Add Order"
+                component={AddOrder}
+                options={{
+                    tabBarIcon: ({ focused }) => <SVGAdd size="30px" />,
                 }}
             />
             <Tab.Screen

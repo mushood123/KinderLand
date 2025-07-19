@@ -34,7 +34,7 @@ export const ForgotPassword = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Forgot Password</Text>
-      
+
       <TextInput
         style={[styles.input, emailError ? styles.inputError : null]}
         placeholder="Enter your email"
@@ -49,10 +49,10 @@ export const ForgotPassword = () => {
         autoCapitalize="none"
         autoCorrect={false}
       />
-      
+
       {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-      
-      <TouchableOpacity 
+
+      <TouchableOpacity
         style={styles.button}
         onPress={handleSendResetLink}
       >
