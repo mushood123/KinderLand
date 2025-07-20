@@ -85,7 +85,6 @@ export const EditOrder = () => {
 						/>
 					</View>
 
-					{/* Product List */}
 					<View style={styles.productList}>
 						{productData.map((item) => (
 							<ProductCard

@@ -30,13 +30,18 @@ export const Home = () => {
 		navigation.navigate('Notifications');
 	};
 
+	const handleProfilePress = () => {
+		console.log('Profile pressed');
+		navigation.navigate('Profile');
+	};
+
 	return (
 		<>
 			<Header
 				userName="Danny"
 				notificationCount={10}
 				onNotificationPress={handleNotificationPress}
-				onProfilePress={() => console.log('Profile pressed')}
+				onProfilePress={handleProfilePress}
 			/>
 			<FlatList
 				contentContainerStyle={styles.container}

@@ -9,6 +9,8 @@ import { EditOrder } from './editOrder';
 import { SizeQuantity } from './sizeQuantity';
 import { AddOrder } from './addOrder';
 import { Notifications } from './notifications';
+import { ProfileNavigator } from './profile';
+
 import { SVGCustomers, SVGHome, SVGProducts, SVGReports, SVGAdd } from '../../assets';
 
 const Stack = createStackNavigator();
@@ -41,6 +43,13 @@ const HomeStack = () => {
                 component={Notifications}
                 options={{
                     headerShown: true
+                }} />
+            <Stack.Screen
+                name="Profile"
+                component={ProfileNavigator}
+                options={{
+                    headerShown: false,
+                    title: 'Profile'
                 }} />
         </Stack.Navigator>
     );
