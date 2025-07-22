@@ -205,9 +205,9 @@ export const customers = [
   },
 ];
 
-
 export const filterOptions = [
   { id: 'storeName', label: 'Store Name', icon: '🏬' },
   { id: 'email', label: 'Email', icon: '📧' },
   { id: 'phone', label: 'Phone', icon: '📞' },
 ];
+

@@ -13,10 +13,10 @@ export const ToolBar = ({
   onListPress = () => { },
   onMenuPress = () => { },
   onAddNewPress = () => { },
-  showGridIcon = true,
+  showGridIcon = false,
   showListIcon = false,
-  showMenuIcon = true,
-  showAddButton = true,
+  showMenuIcon = false,
+  showAddButton = false,
   addButtonText = 'Add New',
 }) => {
   const { width } = Dimensions.get('window');

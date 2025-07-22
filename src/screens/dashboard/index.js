@@ -13,7 +13,8 @@ import { ProfileNavigator } from './profile';
 import { EditCustomer } from './editCustomer';
 import { CustomerInformation } from './customerInformation';
 import { CreateCustomer } from './createCustomer';
-
+import { SelectProduct } from './selectProduct';
+import { ProductTotal } from './productTotal';
 
 import { SVGCustomers, SVGHome, SVGProducts, SVGReports, SVGAdd } from '../../assets';
 
@@ -98,6 +99,38 @@ const CustomerStack = () => {
   );
 };
 
+const OrderStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name='Add Order'
+        component={AddOrder}
+        options={{
+          headerLeft: () => null,
+          headerShown: true,
+          title: 'New Order'
+        }}
+      />
+      <Stack.Screen
+        name='Select Product'
+        component={SelectProduct}
+        options={{
+          headerShown: true,
+          title: 'Select Product'
+        }}
+      />
+      <Stack.Screen
+        name='Product Total'
+        component={ProductTotal}
+        options={{
+          headerShown: true,
+          title: 'Product Total'
+        }}
+      />
+    </Stack.Navigator>
+  )
+}
+
 export const Dashboard = () => {
   return (
     <Tab.Navigator>
@@ -119,9 +152,11 @@ export const Dashboard = () => {
       />
       <Tab.Screen
         name="Add Order"
-        component={AddOrder}
+        component={OrderStack}
         options={{
+          headerShown: false,
           tabBarIcon: ({ focused }) => <SVGAdd size="30px" />,
+
         }}
       />
       <Tab.Screen
