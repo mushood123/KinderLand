@@ -1,0 +1,42 @@
+export const orders = [
+  {
+    poNumber: 'PO-1001',
+    productName: 'Wireless Mouse',
+    customerName: 'Alice Johnson',
+    orderDate: '2025-07-15',
+    shippingAddress: '123 Main St, Springfield, IL, USA',
+    status: 'Pending',
+  },
+  {
+    poNumber: 'PO-1002',
+    productName: 'Bluetooth Headphones',
+    customerName: 'Bob Smith',
+    orderDate: '2025-07-14',
+    shippingAddress: '456 Oak Rd, Dallas, TX, USA',
+    status: 'Shipped',
+  },
+  {
+    poNumber: 'PO-1003',
+    productName: 'Mechanical Keyboard',
+    customerName: 'Carla Gomez',
+    orderDate: '2025-07-13',
+    shippingAddress: '789 Pine Ave, Miami, FL, USA',
+    status: 'Delivered',
+  },
+  {
+    poNumber: 'PO-1004',
+    productName: '4K Monitor',
+    customerName: 'Daniel Lee',
+    orderDate: '2025-07-12',
+    shippingAddress: '321 Elm St, Seattle, WA, USA',
+    status: 'Cancelled',
+  },
+  {
+    poNumber: 'PO-1005',
+    productName: 'USB-C Docking Station',
+    customerName: 'Emily Davis',
+    orderDate: '2025-07-11',
+    shippingAddress: '987 Maple Dr, Austin, TX, USA',
+    status: 'Pending',
+  },
+];

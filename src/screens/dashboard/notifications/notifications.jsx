@@ -1,27 +1,48 @@
+import React, { useState } from 'react';
 import { View, Text } from 'react-native';
 import { styles } from './styles';
-import { NotificationCard } from '../../../components';
+import { NotificationCard, ViewNotificationModal } from '../../../components';
 import { notifications } from './data';
 
 export const Notifications = () => {
-  const handleNotificationPress = (title) => {
-    console.log('Notification pressed:', title);
+  const [selectedNotification, setSelectedNotification] = useState(null);
+  const [notificationModalVisible, setNotificationModalVisible] = useState(false);
+
+  const handleNotificationPress = (notification) => {
+    console.log('Notification pressed:');
+    setSelectedNotification(notification);
+    setNotificationModalVisible(true);
+    notification.isRead = true;
   };
+  const handleCloseModal = () => {
+    console.log('Modal closed');
+    setNotificationModalVisible(false);
+  }
   return (
-    <View style={{ flex: 1, backgroundColor: '#F9FAFB', paddingTop: 20 }}>
-      {notifications?.map((notification) => (
-        <NotificationCard
-          key={notification.id}
-          date={notification.date}
-          time={notification.time}
-          title={notification.title}
-          description={notification.description}
-          logoComponent={notification.logo}
-          logoBackgroundColor={notification.logoBg}
-          isRead={notification.isRead}
-          onPress={() => handleNotificationPress(notification.title)}
-        />
-      ))}
-    </View>
+    <>
+      <View style={styles.container}>
+        {notifications?.map((notification) => (
+          <NotificationCard
+            key={notification.id}
+            date={notification.date}
+            time={notification.time}
+            title={notification.title}
+            description={notification.description}
+            logoComponent={notification.logo}
+            logoBackgroundColor={notification.logoBg}
+            isRead={notification.isRead}
+            onPress={() => handleNotificationPress(notification)}
+          />
+        ))}
+      </View>
+      <ViewNotificationModal
+        visible={notificationModalVisible}
+        title={selectedNotification?.title}
+        description={selectedNotification?.description}
+        onClose={handleCloseModal}
+        showCloseButton={true}
+        animationType="fade"
+      />
+    </>
   );
 }

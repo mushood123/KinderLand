@@ -18,7 +18,7 @@ export const NotificationCard = ({
   onPress,
 }) => {
   const handlePress = () => {
-    console.log('Notification pressed:', title);
+    console.log('Notification pressed:');
     onPress?.();
   };
 

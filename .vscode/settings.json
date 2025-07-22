@@ -1,21 +1,24 @@
 {
-    "git.ignoreLimitWarning": true,
+  "git.ignoreLimitWarning": true,
+  "editor.formatOnSave": true,
+  "editor.wordWrap": "on",
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "editor.insertSpaces": true,
+  "editor.formatOnPaste": true,
+  "files.associations": {
+    "*.jsx": "javascriptreact",
+    "*.js": "javascript"
+  },
+  "[javascript]": {
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+    "editor.formatOnPaste": true
+  },
+  "[javascriptreact]": {
     "editor.formatOnSave": true,
     "editor.wordWrap": "on",
-    "editor.formatOnPaste": true,
-    "[javascriptreact]": {
-        "editor.formatOnSave": true,
-        "editor.wordWrap": "on",
-        "editor.tabSize": 2,
-        "editor.formatOnPaste": true
-    },
-    "files.associations": {
-        "*.jsx": "javascriptreact",
-        "*.js": "javascript"
-    },
-    "[javascript]": {
-        "editor.formatOnSave": true,
-        "editor.tabSize": 2,
-        "editor.formatOnPaste": true
-    }
+    "editor.tabSize": 2,
+    "editor.formatOnPaste": true
+  }
 }
