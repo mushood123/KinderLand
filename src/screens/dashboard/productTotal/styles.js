@@ -86,7 +86,10 @@ export const styles = StyleSheet.create({
     marginRight: 12,
   },
   quantityButtonSelected: {
-    backgroundColor: '#6B7280',
+    backgroundColor: '#3B82F6',
+  },
+  quantityButtonDisabled: {
+    backgroundColor: '#F3F4F6',
   },
   quantityButtonText: {
     fontSize: 16,
@@ -95,6 +98,9 @@ export const styles = StyleSheet.create({
   },
   quantityButtonTextSelected: {
     color: '#FFFFFF',
+  },
+  quantityButtonTextDisabled: {
+    color: '#9CA3AF',
   },
   quantityActionButton: {
     width: 44,
@@ -105,10 +111,16 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 12,
   },
+  quantityActionButtonDisabled: {
+    backgroundColor: '#F3F4F6',
+  },
   quantityActionText: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#FFFFFF',
+  },
+  quantityActionTextDisabled: {
+    color: '#9CA3AF',
   },
   sizeList: {
     paddingBottom: 100,

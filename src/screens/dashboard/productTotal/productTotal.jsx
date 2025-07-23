@@ -14,21 +14,21 @@ import { sizeData, quantityButtons } from './data';
 
 export const ProductTotal = ({ route }) => {
   const [quantities, setQuantities] = useState({
-    21: 1,
-    26: 8,
+
   });
-  const [selectedQuantityButton, setSelectedQuantityButton] = useState(1);
+  const [selectedSizes, setSelectedSizes] = useState(new Set());
+  const [selectedQuantity, setSelectedQuantity] = useState(null);
   const navigation = useNavigation();
   const { productName } = route.params;
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: productName || 'Size Quantity',
       headerRight: () => (
-        <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
+        <TouchableOpacity onPress={handleClear} style={styles.deleteButton}>
           <Text style={styles.deleteIcon}>🗑</Text>
         </TouchableOpacity>
       )
-
     });
   }, [navigation, productName]);
 
@@ -40,45 +40,105 @@ export const ProductTotal = ({ route }) => {
     console.log('Back button pressed');
   };
 
-  const handleDelete = () => {
-    console.log('Delete button pressed');
+  const handleClear = () => {
+    setQuantities({});
+    setSelectedSizes(new Set());
+    setSelectedQuantity(null);
+    console.log('All quantities and selections cleared');
   };
 
   const handleQuantityButtonPress = (value) => {
     if (typeof value === 'number') {
-      setSelectedQuantityButton(value);
-      console.log('Selected quantity:', value);
+      setSelectedQuantity(value);
+      console.log(`Quantity ${value} selected`);
+
+      if (selectedSizes.size > 0) {
+        applyQuantityToSelectedSizes(value);
+      }
     } else {
       console.log('Hash button pressed');
     }
   };
 
+  const applyQuantityToSelectedSizes = (quantity) => {
+    setQuantities(prev => {
+      const newQuantities = { ...prev };
+      selectedSizes.forEach(size => {
+        newQuantities[size] = quantity;
+      });
+      console.log(`Applied quantity ${quantity} to sizes: ${Array.from(selectedSizes).join(', ')}`);
+      return newQuantities;
+    });
+  };
+
   const handleQuantityIncrease = () => {
-    if (selectedQuantityButton !== null) {
-      setQuantities(prev => ({
-        ...prev,
-        [selectedQuantityButton]: (prev[selectedQuantityButton] || 0) + 1
-      }));
+    if (selectedSizes.size === 0) {
+      console.log('Please select sizes first');
+      return;
     }
+
+    const currentQuantity = selectedQuantity || 0;
+    const newQuantity = currentQuantity + 1;
+    setSelectedQuantity(newQuantity);
+
+    applyQuantityToSelectedSizes(newQuantity);
+
+    console.log(`Increased selected quantity to ${newQuantity}`);
   };
 
   const handleQuantityDecrease = () => {
-    if (selectedQuantityButton !== null) {
-      setQuantities(prev => ({
-        ...prev,
-        [selectedQuantityButton]: Math.max(0, (prev[selectedQuantityButton] || 0) - 1)
-      }));
+    if (selectedSizes.size === 0) {
+      console.log('Please select sizes first');
+      return;
     }
+
+    const currentQuantity = selectedQuantity || 0;
+    const newQuantity = Math.max(0, currentQuantity - 1);
+    setSelectedQuantity(newQuantity);
+
+    applyQuantityToSelectedSizes(newQuantity);
+
+    console.log(`Decreased selected quantity to ${newQuantity}`);
   };
 
   const handleSizeCardPress = (item) => {
-    console.log('Size selected:', item.size);
-    // You can add logic here to handle size selection
+    const size = item.size;
+    const newSelectedSizes = new Set(selectedSizes);
+
+    if (newSelectedSizes.has(size)) {
+      newSelectedSizes.delete(size);
+      console.log(`Size ${size} removed from selection`);
+    } else {
+      newSelectedSizes.add(size);
+      console.log(`Size ${size} added to selection`);
+
+      if (selectedQuantity !== null) {
+        setQuantities(prev => ({
+          ...prev,
+          [size]: selectedQuantity
+        }));
+        console.log(`Applied quantity ${selectedQuantity} to size ${size}`);
+      }
+    }
+
+    setSelectedSizes(newSelectedSizes);
   };
 
   const handleCartPress = () => {
     console.log('Cart button pressed');
     console.log('Current quantities:', quantities);
+    console.log('Selected sizes:', Array.from(selectedSizes));
+    console.log('Selected quantity:', selectedQuantity);
+  };
+
+  const getInstructionText = () => {
+    if (selectedQuantity === null) {
+      return 'First, select a quantity from the buttons above.';
+    } else if (selectedSizes.size === 0) {
+      return `Quantity ${selectedQuantity} selected. Now select sizes to apply this quantity.`;
+    } else {
+      return `Quantity ${selectedQuantity} will be applied to ${selectedSizes.size} selected size(s).`;
+    }
   };
 
   return (
@@ -87,7 +147,7 @@ export const ProductTotal = ({ route }) => {
         <View style={styles.titleSection}>
           <Text style={styles.title}>Select Size And Quantity</Text>
           <View style={styles.instructionRow}>
-            <Text style={styles.instruction}>Please select the size and quantity of product.</Text>
+            <Text style={styles.instruction}>{getInstructionText()}</Text>
             <Text style={styles.totalPairs}>{getTotalPairs()} Pairs</Text>
           </View>
         </View>
@@ -99,14 +159,14 @@ export const ProductTotal = ({ route }) => {
                 key={index}
                 style={[
                   styles.quantityButton,
-                  selectedQuantityButton === value && styles.quantityButtonSelected
+                  selectedQuantity === value && styles.quantityButtonSelected
                 ]}
                 onPress={() => handleQuantityButtonPress(value)}
               >
                 <Text
                   style={[
                     styles.quantityButtonText,
-                    selectedQuantityButton === value && styles.quantityButtonTextSelected
+                    selectedQuantity === value && styles.quantityButtonTextSelected
                   ]}
                 >
                   {value}
@@ -114,12 +174,32 @@ export const ProductTotal = ({ route }) => {
               </TouchableOpacity>
             ))}
 
-            <TouchableOpacity style={styles.quantityActionButton} onPress={handleQuantityIncrease}>
-              <Text style={styles.quantityActionText}>+</Text>
+            <TouchableOpacity
+              style={[
+                styles.quantityActionButton,
+                selectedSizes.size === 0 && styles.quantityActionButtonDisabled
+              ]}
+              onPress={handleQuantityIncrease}
+              disabled={selectedSizes.size === 0}
+            >
+              <Text style={[
+                styles.quantityActionText,
+                selectedSizes.size === 0 && styles.quantityActionTextDisabled
+              ]}>+</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.quantityActionButton} onPress={handleQuantityDecrease}>
-              <Text style={styles.quantityActionText}>-</Text>
+            <TouchableOpacity
+              style={[
+                styles.quantityActionButton,
+                selectedSizes.size === 0 && styles.quantityActionButtonDisabled
+              ]}
+              onPress={handleQuantityDecrease}
+              disabled={selectedSizes.size === 0}
+            >
+              <Text style={[
+                styles.quantityActionText,
+                selectedSizes.size === 0 && styles.quantityActionTextDisabled
+              ]}>-</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>
@@ -131,6 +211,7 @@ export const ProductTotal = ({ route }) => {
               item={item}
               currentQuantity={quantities[item.size] || 0}
               onPress={handleSizeCardPress}
+              isSelected={selectedSizes.has(item.size)}
             />
           ))}
         </View>
