@@ -15,8 +15,9 @@ import { CustomerInformation } from './customerInformation';
 import { CreateCustomer } from './createCustomer';
 import { SelectProduct } from './selectProduct';
 import { ProductTotal } from './productTotal';
-
+import { OrderCart } from './orderCart';
 import { SVGCustomers, SVGHome, SVGProducts, SVGReports, SVGAdd } from '../../assets';
+import { ShippingInfo } from './shippingInfo';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -125,6 +126,22 @@ const OrderStack = () => {
         options={{
           headerShown: true,
           title: 'Product Total'
+        }}
+      />
+      <Stack.Screen
+        name='Order Cart'
+        component={OrderCart}
+        options={{
+          headerShown: true,
+          title: 'Cart'
+        }}
+      />
+      <Stack.Screen
+        name='Shipping Info'
+        component={ShippingInfo}
+        options={{
+          headerShown: true,
+          title: 'Shipping Info'
         }}
       />
     </Stack.Navigator>

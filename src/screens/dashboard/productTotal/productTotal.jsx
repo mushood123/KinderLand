@@ -19,18 +19,18 @@ export const ProductTotal = ({ route }) => {
   const [selectedSizes, setSelectedSizes] = useState(new Set());
   const [selectedQuantity, setSelectedQuantity] = useState(null);
   const navigation = useNavigation();
-  const { productName } = route.params;
+  const { product } = route.params;
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: productName || 'Size Quantity',
+      title: product?.productName || 'Size Quantity',
       headerRight: () => (
         <TouchableOpacity onPress={handleClear} style={styles.deleteButton}>
           <Text style={styles.deleteIcon}>🗑</Text>
         </TouchableOpacity>
       )
     });
-  }, [navigation, productName]);
+  }, [navigation, product?.productName]);
 
   const getTotalPairs = () => {
     return Object.values(quantities).reduce((sum, qty) => sum + qty, 0);
@@ -129,6 +129,7 @@ export const ProductTotal = ({ route }) => {
     console.log('Current quantities:', quantities);
     console.log('Selected sizes:', Array.from(selectedSizes));
     console.log('Selected quantity:', selectedQuantity);
+    navigation.navigate('Order Cart', { product: product, quantities: quantities, selectedSizes: selectedSizes, selectedQuantity: selectedQuantity });
   };
 
   const getInstructionText = () => {

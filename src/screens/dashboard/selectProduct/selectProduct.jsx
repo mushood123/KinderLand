@@ -34,7 +34,7 @@ export const SelectProduct = () => {
 
   const handleProductPress = (item) => {
     setSelectedProduct(item);
-    navigation.navigate('Product Total', { productName: item?.productName });
+    navigation.navigate('Product Total', { product: item });
     console.log("Selected product:", item?.productName);
   };
 

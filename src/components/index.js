@@ -13,6 +13,8 @@ import { ToolBar } from "./toolBar";
 import { EditCustomerCard } from "./editCustomerCard";
 import { OrderHistoryCard } from "./orderHistoryCard";
 import { ProductDetailCard } from "./productDetailCard";
+import { ProductInventoryCard } from "./productInventoryCard";
+import { CartSummaryCard } from "./cartSummaryCard";
 
 export {
   OrderCard,
@@ -29,5 +31,7 @@ export {
   ToolBar,
   EditCustomerCard,
   OrderHistoryCard,
-  ProductDetailCard
+  ProductDetailCard,
+  ProductInventoryCard,
+  CartSummaryCard
 };
