@@ -206,8 +206,11 @@ export const customers = [
 ];
 
 export const filterOptions = [
-  { id: 'storeName', label: 'Store Name', icon: '🏬' },
-  { id: 'email', label: 'Email', icon: '📧' },
-  { id: 'phone', label: 'Phone', icon: '📞' },
+  { id: 'storeName', label: 'Store Name (A-Z)', icon: '🏬' },
+  { id: 'storeNameDesc', label: 'Store Name (Z-A)', icon: '🏬' },
+  { id: 'customerName', label: 'Customer Name (A-Z)', icon: '👤' },
+  { id: 'customerNameDesc', label: 'Customer Name (Z-A)', icon: '👤' },
+  { id: 'address', label: 'Address (A-Z)', icon: '📍' },
+  { id: 'addressDesc', label: 'Address (Z-A)', icon: '📍' },
 ];
 
