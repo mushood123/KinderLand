@@ -1,17 +1,19 @@
 import { FlatList } from 'react-native';
 import { styles } from './styles';
 import { OrderCard } from '../../../components';
-import { orders } from './data';
+import { orders as dummyOrders } from './data';
 import { DeleteConfirmationModal } from '../../../components';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { Header } from '../../../components';
 import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../../../context';
+import { ENDPOINTS, get, post, put, del } from '../../../api';
 export const Home = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const navigation = useNavigation();
   const { user } = useContext(UserContext);
+  const [orders, setOrders] = useState([]);
   const handleEdit = (item) => {
     console.log(`Edit order ${item.poNumber}`);
     setSelectedOrder(item);
@@ -35,10 +37,20 @@ export const Home = () => {
     navigation.navigate('Profile');
   };
 
+  const getOrders = async () => {
+    const res = await get(ENDPOINTS.HISTORY_ORDERS);
+    console.log('orders', res);
+    setOrders(res);
+  }
+
+  useEffect(() => {
+    getOrders();
+  }, []);
+
   return (
     <>
       <Header
-        userName={user.name}
+        userName={user?.name}
         notificationCount={10}
         onNotificationPress={handleNotificationPress}
         onProfilePress={handleProfilePress}
@@ -49,11 +61,11 @@ export const Home = () => {
         keyExtractor={(item) => item.poNumber}
         renderItem={({ item }) => (
           <OrderCard
-            poNumber={item.poNumber}
+            poNumber={item.orderNumber}
             productCategory={item.productCategory}
-            productName={item.productName}
+            productName={item.storeName}
             customerName={item.customerName}
-            date={item.date}
+            date={item.orderDate}
             shippingAddress={item.shippingAddress}
             status={item.status}
             onEdit={() => handleEdit(item)}

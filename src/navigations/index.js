@@ -1,2 +1,2 @@
-import { PublicStack } from "./public/stackNavigation";
-export {PublicStack}
+import { navigation } from "./stackNavigation";
+export { navigation }

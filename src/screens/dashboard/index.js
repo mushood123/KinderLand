@@ -1,3 +1,4 @@
+import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -23,7 +24,13 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 
+const ProfileWrapper = React.memo(() => {
+  console.log('ProfileWrapper rendered');
+  return <ProfileNavigator />;
+});
+
 const HomeStack = () => {
+  console.log('HomeStack rendered');
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -52,11 +59,12 @@ const HomeStack = () => {
         }} />
       <Stack.Screen
         name="Profile"
-        component={ProfileNavigator}
+        component={ProfileWrapper}
         options={{
           headerShown: false,
-          title: 'Profile'
-        }} />
+          title: 'Profile',
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -148,12 +156,19 @@ const OrderStack = () => {
   )
 }
 
-export const Dashboard = () => {
+const HomeStackWrapper = React.memo(() => {
+  console.log('HomeStackWrapper rendered');
+  return <HomeStack />;
+});
+
+export const Dashboard = ({ route }) => {
+  const { handleLogout } = route.params || {};
+  console.log('handleLogout from dashboard', handleLogout);
   return (
     <Tab.Navigator>
       <Tab.Screen
         name="Home"
-        component={HomeStack}
+        component={HomeStackWrapper}
         options={{
           headerShown: false,
           tabBarIcon: ({ focused }) => <SVGHome size="25px" />,

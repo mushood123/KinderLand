@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useContext } from 'react';
 import {
   View,
   Text,
@@ -10,17 +10,19 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from './styles';
+import { UserContext } from '../../../../context';
+import { useLogout } from '../../../../context/logoutContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-let {
-  userName = 'Danny Farago',
-  email = 'danny@venettini.app',
-  storePhone = '+1 234 567 8900',
-  storeName = 'Great Store',
-  profileImage = '/placeholder.svg?height=120&width=120',
-} = {};
 
-export const ViewProfile = ({ }) => {
+
+export const ViewProfile = () => {
   const navigation = useNavigation();
+  const { user } = useContext(UserContext);
+  const handleLogout = useLogout();
+  console.log('handleLogout from viewProfile (context):', handleLogout);
+  console.log('handleLogout type:', typeof handleLogout);
+  console.log('handleLogout is function:', typeof handleLogout === 'function');
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -43,9 +45,7 @@ export const ViewProfile = ({ }) => {
     navigation.navigate('EditProfile');
     console.log('Edit Profile pressed');
   };
-  const handleLogout = () => {
-    console.log('Logout pressed');
-  };
+
 
   const renderInfoRow = (label, value) => (
     <View style={styles.infoRow}>
@@ -60,25 +60,31 @@ export const ViewProfile = ({ }) => {
         <View style={styles.profileSection}>
           <View style={[styles.profileImageContainer, isTablet && styles.profileImageContainerTablet]}>
             <Image
-              source={{ uri: profileImage }}
+              source={{ uri: user?.image }}
               style={[styles.profileImage, isTablet && styles.profileImageTablet]}
               resizeMode="cover"
             />
           </View>
           <Text style={[styles.userName, isTablet && styles.userNameTablet]}>
-            {userName}
+            {user?.firstname + ' ' + user?.lastname}
           </Text>
         </View>
 
         <View style={[styles.infoCard, isTablet && styles.infoCardTablet]}>
-          {renderInfoRow('Email', email)}
-          {renderInfoRow('Store Phone', storePhone)}
-          {renderInfoRow('Store Name', storeName)}
+          {renderInfoRow('Email', user?.email)}
+          {renderInfoRow('Store Phone', user?.phone)}
+          {renderInfoRow('Store Name', user?.storeName)}
         </View>
 
         <TouchableOpacity
           style={[styles.logoutButton, isTablet && styles.logoutButtonTablet]}
-          onPress={handleLogout}
+          onPress={() => {
+            if (typeof handleLogout === 'function') {
+              handleLogout();
+            } else {
+              console.error('handleLogout is not a function:', handleLogout);
+            }
+          }}
           activeOpacity={0.8}
         >
           <Text style={[styles.logoutButtonText, isTablet && styles.logoutButtonTextTablet]}>

@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { styles } from './styles';
+import { ENDPOINTS, get, post, put, del } from '../../../api';
+import { UserContext } from '../../../context';
 
 export const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -16,13 +20,13 @@ export const LoginScreen = () => {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const navigation = useNavigation();
-
+  const { setUser } = useContext(UserContext);
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     let isValid = true;
 
     // Reset errors
@@ -47,7 +51,26 @@ export const LoginScreen = () => {
     if (isValid) {
       console.log('Username:', email);
       console.log('Password:', password);
-      navigation.navigate('Dashboard')
+
+      try {
+        const res = await post(ENDPOINTS.LOGIN, { email, password });
+
+        if (res.isAuth && res.token) {
+          await AsyncStorage.setItem('token', res.token);
+          setUser(res.EmployeeDetails);
+          Alert.alert('Login Success', 'Welcome back!', [
+            {
+              text: 'OK',
+              onPress: () => navigation.replace('Dashboard')
+            }
+          ]);
+        } else {
+          Alert.alert('Login Failed', 'Invalid credentials');
+        }
+      } catch (err) {
+        console.log('Login error:', err);
+        Alert.alert('Error', err?.message || 'Something went wrong. Please try again.');
+      }
     }
   };
 
