@@ -1,15 +1,16 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'react-native';
-import { UserProvider } from './src/context';
+import { UserProvider, UserContext } from './src/context';
 import { LogoutProvider } from './src/context/logoutContext';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useContext } from 'react';
 import { navigation } from './src/navigations';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function App() {
-  const [token, setToken] = useState(null);
-  const [renderKey, setRenderKey] = useState(0);
+// Wrapper component to access UserContext
+const AppContent = ({ token, setToken, renderKey, setRenderKey }) => {
+  const { clearUser, isLoading } = useContext(UserContext);
+
   const checkToken = async () => {
     try {
       const storedToken = await AsyncStorage.getItem('token');
@@ -30,6 +31,7 @@ function App() {
       setToken(null);
     }
   };
+
   // Fetch token on app start
   useEffect(() => {
     checkToken();
@@ -48,13 +50,17 @@ function App() {
       return prev + 1;
     });
   }, [token]);
-  console.log('token from app', token);
+
   const handleLogout = useCallback(async () => {
     console.log('Logout pressed');
     console.log('Current token before logout:', token);
     try {
       await AsyncStorage.removeItem('token');
       console.log('Token removed from AsyncStorage');
+
+      // Clear user data
+      await clearUser();
+      console.log('User data cleared');
 
       // Force a re-render by incrementing render key first
       setRenderKey(prev => prev + 1);
@@ -69,7 +75,9 @@ function App() {
     } catch (error) {
       console.error('Error removing token:', error);
     }
-  }, []);
+  }, [token, clearUser]);
+
+  console.log('token from app', token);
 
   console.log('=== App.jsx RE-RENDER ===');
   console.log('Render key:', renderKey);
@@ -77,22 +85,54 @@ function App() {
   console.log('Token type:', typeof token);
   console.log('Token truthy check:', !!token);
   console.log('handleLogout function created:', typeof handleLogout);
-  console.log('About to render navigation with token:', token, 'and handleLogout:', typeof handleLogout);
+  console.log('UserContext loading:', isLoading);
+  console.log(
+    'About to render navigation with token:',
+    token,
+    'and handleLogout:',
+    typeof handleLogout,
+  );
+
+  // Show loading screen while user data is being loaded
+  if (isLoading) {
+    return (
+      <GestureHandlerRootView
+        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+      >
+        <StatusBar hidden={true} />
+        {/* You can add a proper loading component here */}
+      </GestureHandlerRootView>
+    );
+  }
+
+  return (
+    <LogoutProvider handleLogout={handleLogout}>
+      <GestureHandlerRootView>
+        <StatusBar hidden={true} />
+        <NavigationContainer
+          key={`${token ? 'private' : 'public'}-${renderKey}`}
+        >
+          {navigation(token, handleLogout)}
+        </NavigationContainer>
+      </GestureHandlerRootView>
+    </LogoutProvider>
+  );
+};
+
+function App() {
+  const [token, setToken] = useState(null);
+  const [renderKey, setRenderKey] = useState(0);
 
   return (
     <UserProvider>
-      <LogoutProvider handleLogout={handleLogout}>
-        <GestureHandlerRootView>
-          <StatusBar hidden={true} />
-          <NavigationContainer key={`${token ? 'private' : 'public'}-${renderKey}`}>
-            {navigation(token, handleLogout)}
-          </NavigationContainer>
-        </GestureHandlerRootView>
-      </LogoutProvider>
+      <AppContent
+        token={token}
+        setToken={setToken}
+        renderKey={renderKey}
+        setRenderKey={setRenderKey}
+      />
     </UserProvider>
   );
 }
-
-
 
 export default App;
