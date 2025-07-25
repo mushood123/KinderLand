@@ -15,13 +15,15 @@ export const CustomerCard = ({
   id,
   layout,
   onPress,
+  customer, // Add customer prop to receive full customer data
 }) => {
   const { width } = Dimensions.get('window');
   const isTablet = width > 768;
 
   const handlePress = () => {
     console.log('Customer card pressed:', { shopName, name, id });
-    onPress?.({ shopName, address, name, id });
+    // Pass the complete customer object instead of just selected fields
+    onPress?.(customer || { shopName, address, name, id });
   };
 
   const renderListLayout = () => (

@@ -1,15 +1,17 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'react-native';
-import { UserProvider } from './src/context';
+import { UserProvider, UserContext } from './src/context';
 import { LogoutProvider } from './src/context/logoutContext';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useContext } from 'react';
 import { navigation } from './src/navigations';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function App() {
+function AppContent() {
   const [token, setToken] = useState(null);
   const [renderKey, setRenderKey] = useState(0);
+  const { clearUser } = useContext(UserContext);
+
   const checkToken = async () => {
     try {
       const storedToken = await AsyncStorage.getItem('token');
@@ -30,6 +32,7 @@ function App() {
       setToken(null);
     }
   };
+
   // Fetch token on app start
   useEffect(() => {
     checkToken();
@@ -48,13 +51,19 @@ function App() {
       return prev + 1;
     });
   }, [token]);
+
   console.log('token from app', token);
+
   const handleLogout = useCallback(async () => {
     console.log('Logout pressed');
     console.log('Current token before logout:', token);
     try {
       await AsyncStorage.removeItem('token');
       console.log('Token removed from AsyncStorage');
+
+      // Clear user data from context
+      await clearUser();
+      console.log('User data cleared from context');
 
       // Force a re-render by incrementing render key first
       setRenderKey(prev => prev + 1);
@@ -69,7 +78,7 @@ function App() {
     } catch (error) {
       console.error('Error removing token:', error);
     }
-  }, []);
+  }, [clearUser]);
 
   console.log('=== App.jsx RE-RENDER ===');
   console.log('Render key:', renderKey);
@@ -80,19 +89,23 @@ function App() {
   console.log('About to render navigation with token:', token, 'and handleLogout:', typeof handleLogout);
 
   return (
-    <UserProvider>
-      <LogoutProvider handleLogout={handleLogout}>
-        <GestureHandlerRootView>
-          <StatusBar hidden={true} />
-          <NavigationContainer key={`${token ? 'private' : 'public'}-${renderKey}`}>
-            {navigation(token, handleLogout)}
-          </NavigationContainer>
-        </GestureHandlerRootView>
-      </LogoutProvider>
-    </UserProvider>
+    <LogoutProvider handleLogout={handleLogout}>
+      <GestureHandlerRootView>
+        <StatusBar hidden={true} />
+        <NavigationContainer key={`${token ? 'private' : 'public'}-${renderKey}`}>
+          {navigation(token, handleLogout)}
+        </NavigationContainer>
+      </GestureHandlerRootView>
+    </LogoutProvider>
   );
 }
 
-
+function App() {
+  return (
+    <UserProvider>
+      <AppContent />
+    </UserProvider>
+  );
+}
 
 export default App;

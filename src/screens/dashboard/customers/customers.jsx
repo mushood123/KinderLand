@@ -1,9 +1,11 @@
 import React, { useLayoutEffect, useState, useMemo } from 'react';
 import { View, FlatList } from 'react-native';
 import { styles } from './styles';
-import { customers, filterOptions } from './data';
+import { filterOptions } from './data';
 import { CustomerCard, SearchBar, ToolBar, FilterModal } from '../../../components';
 import { useNavigation } from '@react-navigation/native';
+import { ENDPOINTS } from '../../../api/endpoints';
+import { get, post, put, del } from '../../../api/apiClient';
 
 export const Customers = () => {
   const navigation = useNavigation();
@@ -11,10 +13,24 @@ export const Customers = () => {
   const [filterModal, setFilterModal] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState(null);
   const [searchText, setSearchText] = useState('');
+  const [apiCustomers, setApiCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Transform API data to match the expected format
+  const transformApiData = (apiData) => {
+    return apiData.map(customer => ({
+      id: customer.customerid || customer._id,
+      shopName: customer.StoreName || '',
+      name: `${customer.firstname || ''} ${customer.lastname || ''}`.trim(),
+      address: `${customer.s_address1 || ''} ${customer.s_address2 || ''} ${customer.s_city || ''} ${customer.s_state || ''} ${customer.s_postcode || ''}`.trim().replace(/\s+/g, ' '),
+      // Store additional API data for future use
+      apiData: customer
+    }));
+  };
 
   // Filter and sort customers based on search text and selected filter
   const filteredCustomers = useMemo(() => {
-    let result = customers;
+    let result = apiCustomers;
 
     // First apply search filter
     if (searchText.trim()) {
@@ -57,9 +73,31 @@ export const Customers = () => {
     }
 
     return result;
-  }, [searchText, selectedFilter]);
+  }, [apiCustomers, searchText, selectedFilter]);
 
   useLayoutEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        setLoading(true);
+        const response = await post(ENDPOINTS.GET_CUSTOMERS);
+        console.log('Customers fetched:', response);
+
+        if (response && Array.isArray(response)) {
+          const transformedData = transformApiData(response);
+          setApiCustomers(transformedData);
+        } else {
+          console.error('Invalid response format:', response);
+          setApiCustomers([]);
+        }
+      } catch (error) {
+        console.error('Error fetching customers:', error);
+        setApiCustomers([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchCustomers();
     navigation.setOptions({
       headerRight: () => {
         return (
@@ -79,7 +117,13 @@ export const Customers = () => {
 
   const handleCustomerPress = (customer) => {
     console.log('Customer selected:', customer);
-    navigation.navigate("Customer Information", { customer })
+    // Pass both transformed data and original API data for complete customer information
+    navigation.navigate("Customer Information", {
+      customer: {
+        ...customer,
+        originalData: customer.apiData // Include the original API response data
+      }
+    })
   }
 
   const handleSearch = (text) => {
@@ -126,6 +170,7 @@ export const Customers = () => {
       name={item.name}
       id={item.id}
       layout={customerList}
+      customer={item} // Pass the complete customer object
       onPress={(customer) => handleCustomerPress(customer)}
     />
   );

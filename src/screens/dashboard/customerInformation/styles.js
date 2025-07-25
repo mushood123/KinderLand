@@ -14,5 +14,19 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
     marginVertical: 20
+  },
+  loadingText: {
+    alignSelf: 'center',
+    fontSize: 16,
+    color: '#666',
+    marginTop: 20,
+    fontStyle: 'italic'
+  },
+  noOrdersText: {
+    alignSelf: 'center',
+    fontSize: 16,
+    color: '#666',
+    marginTop: 20,
+    fontStyle: 'italic'
   }
 })

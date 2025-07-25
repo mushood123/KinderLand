@@ -54,6 +54,7 @@ export const Home = () => {
         notificationCount={10}
         onNotificationPress={handleNotificationPress}
         onProfilePress={handleProfilePress}
+        userImage={user?.image || user?.avatar}
       />
       <FlatList
         contentContainerStyle={styles.container}

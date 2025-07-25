@@ -1,16 +1,58 @@
-import React, { useLayoutEffect, useState, useMemo } from "react";
-import { View, Text, FlatList } from "react-native";
+import React, { useLayoutEffect, useState, useMemo, useEffect } from "react";
+import { View, Text, FlatList, ActivityIndicator, Alert } from "react-native";
 import { styles } from "./styles";
 import { SearchBar, ToolBar, FilterModal, CustomerCard } from "../../../components";
 import { useNavigation } from "@react-navigation/native";
-import { customers, filterOptions } from "./data";
+import { filterOptions } from "./data";
+import { ENDPOINTS, post } from "../../../api";
 
 export const AddOrder = () => {
   const [customerList, setCustomerList] = useState('list');
   const [filterModal, setFilterModal] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState(null);
   const [searchText, setSearchText] = useState('');
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigation = useNavigation();
+
+  // Fetch customers from API
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
+
+  const fetchCustomers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await post(ENDPOINTS.GET_CUSTOMERS);
+      const rawCustomers = response.data || response || [];
+
+      // Map API response to expected format
+      const mappedCustomers = rawCustomers.map(customer => ({
+        id: customer.customerid || customer._id,
+        shopName: customer.StoreName || '',
+        name: `${customer.firstname || ''} ${customer.lastname || ''}`.trim(),
+        address: [
+          customer.s_address1,
+          customer.s_address2,
+          customer.s_city,
+          customer.s_state,
+          customer.s_postcode
+        ].filter(Boolean).join(', '),
+        // Keep original data for reference
+        originalData: customer
+      }));
+
+      setCustomers(mappedCustomers);
+    } catch (err) {
+      console.error('Error fetching customers:', err);
+      setError('Failed to load customers. Please try again.');
+      Alert.alert('Error', 'Failed to load customers. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Filter customers based on search text and selected filter
   const filteredCustomers = useMemo(() => {
@@ -20,9 +62,9 @@ export const AddOrder = () => {
     if (searchText.trim()) {
       const searchLower = searchText.toLowerCase().trim();
       filtered = filtered.filter(customer => {
-        const shopName = customer.shopName.toLowerCase();
-        const name = customer.name.toLowerCase();
-        const address = customer.address.toLowerCase();
+        const shopName = customer.shopName?.toLowerCase() || '';
+        const name = customer.name?.toLowerCase() || '';
+        const address = customer.address?.toLowerCase() || '';
 
         return shopName.includes(searchLower) ||
           name.includes(searchLower) ||
@@ -35,17 +77,17 @@ export const AddOrder = () => {
       filtered = [...filtered].sort((a, b) => {
         switch (selectedFilter) {
           case 'storeName':
-            return a.shopName.localeCompare(b.shopName);
+            return (a.shopName || '').localeCompare(b.shopName || '');
           case 'storeNameDesc':
-            return b.shopName.localeCompare(a.shopName);
+            return (b.shopName || '').localeCompare(a.shopName || '');
           case 'customerName':
-            return a.name.localeCompare(b.name);
+            return (a.name || '').localeCompare(b.name || '');
           case 'customerNameDesc':
-            return b.name.localeCompare(a.name);
+            return (b.name || '').localeCompare(a.name || '');
           case 'address':
-            return a.address.localeCompare(b.address);
+            return (a.address || '').localeCompare(b.address || '');
           case 'addressDesc':
-            return b.address.localeCompare(a.address);
+            return (b.address || '').localeCompare(a.address || '');
           default:
             return 0;
         }
@@ -53,7 +95,7 @@ export const AddOrder = () => {
     }
 
     return filtered;
-  }, [searchText, selectedFilter]);
+  }, [customers, searchText, selectedFilter]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -62,11 +104,10 @@ export const AddOrder = () => {
           <ToolBar
             onGridPress={handleGridPress}
             onMenuPress={handleFilterModalOpen}
-            onAddNewPress={handleAddNewPress}
             addButtonText='Add'
             showGridIcon={true}
             showMenuIcon={true}
-            showAddButton={true}
+            showAddButton={false}
           />
         );
       }
@@ -93,9 +134,7 @@ export const AddOrder = () => {
     setCustomerList((prev) => (prev === 'list' ? 'grid' : 'list'));
   };
 
-  const handleAddNewPress = () => {
-    console.log('Add New pressed');
-  };
+
   const handleFilterModalOpen = () => {
     setFilterModal(true)
     console.log('filter modal opens')
@@ -125,6 +164,7 @@ export const AddOrder = () => {
       name={item.name}
       id={item.id}
       layout={customerList}
+      customer={item.originalData}
       onPress={(customer) => handleCustomerPress(customer)}
     />
   );
@@ -138,15 +178,21 @@ export const AddOrder = () => {
         onSearch={handleSearch}
         onClear={handleClearSearch}
       />
-      <FlatList
-        data={filteredCustomers}
-        renderItem={renderCustomerItem}
-        keyExtractor={(item) => item.id.toString()}
-        numColumns={customerList === 'grid' ? 2 : 1}
-        key={customerList}
-        contentContainerStyle={styles.flatListContent}
-        showsVerticalScrollIndicator={false}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" style={styles.loadingIndicator} />
+      ) : error ? (
+        <Text style={styles.errorText}>{error}</Text>
+      ) : (
+        <FlatList
+          data={filteredCustomers}
+          renderItem={renderCustomerItem}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={customerList === 'grid' ? 2 : 1}
+          key={customerList}
+          contentContainerStyle={styles.flatListContent}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
       <FilterModal
         visible={filterModal}
         filterOptions={filterOptions}

@@ -11,6 +11,8 @@ import {
   Alert
 } from "react-native";
 import { styles } from "./styles";
+import { ENDPOINTS } from '../../../api/endpoints';
+import { post } from '../../../api/apiClient';
 
 export const CreateCustomer = () => {
   const { width } = Dimensions.get("window");
@@ -45,6 +47,8 @@ export const CreateCustomer = () => {
     hasSecondContact: false,
     hasThirdContact: false,
   });
+
+  const [loading, setLoading] = useState(false);
 
   const updateField = (field, value) => {
     if (field.includes(".")) {
@@ -103,7 +107,7 @@ export const CreateCustomer = () => {
     });
   };
 
-  const handleCreateCustomer = () => {
+  const handleCreateCustomer = async () => {
     // Basic validation
     if (!customerData.firstName || !customerData.lastName || !customerData.email1) {
       Alert.alert("Validation Error", "Please fill in all required fields (First Name, Last Name, Email)");
@@ -123,33 +127,82 @@ export const CreateCustomer = () => {
       return;
     }
 
-    // Generate customer ID if not provided
-    const finalCustomerData = {
-      ...customerData,
-      customerId: customerData.customerId || generateCustomerId(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+    // Map customerData to required API format
+    const apiPayload = {
+      firstname: customerData.firstName,
+      lastname: customerData.lastName,
+      StoreName: customerData.companyName,
+      email_1: customerData.email1,
+      email_2: customerData.email2,
+      StorePhone: customerData.phone1,
+      cell_1: customerData.phone1, // Assuming phone1 is main cell
+      cell_2: customerData.cell2,
+      // Second Contact (if hasSecondContact is true, otherwise leave blank)
+      sc_firstname: customerData.hasSecondContact ? customerData.sc_firstname || '' : '',
+      sc_lastname: customerData.hasSecondContact ? customerData.sc_lastname || '' : '',
+      sc_email: customerData.hasSecondContact ? customerData.sc_email || '' : '',
+      sc_OfficePhone: customerData.hasSecondContact ? customerData.sc_OfficePhone || '' : '',
+      sc_cell_1: customerData.hasSecondContact ? customerData.sc_cell_1 || '' : '',
+      sc_cell_2: customerData.hasSecondContact ? customerData.sc_cell_2 || '' : '',
+      // Third Contact (if hasThirdContact is true, otherwise leave blank)
+      tc_firstname: customerData.hasThirdContact ? customerData.tc_firstname || '' : '',
+      tc_lastname: customerData.hasThirdContact ? customerData.tc_lastname || '' : '',
+      tc_email: customerData.hasThirdContact ? customerData.tc_email || '' : '',
+      tc_OfficePhone: customerData.hasThirdContact ? customerData.tc_OfficePhone || '' : '',
+      tc_cell_1: customerData.hasThirdContact ? customerData.tc_cell_1 || '' : '',
+      tc_cell_2: customerData.hasThirdContact ? customerData.tc_cell_2 || '' : '',
+      // Shipping Address
+      s_address1: customerData.shippingAddress.address1,
+      s_address2: customerData.shippingAddress.address2,
+      s_street: customerData.shippingAddress.address1, // Assuming address1 is street
+      s_postcode: customerData.shippingAddress.zip,
+      s_city: customerData.shippingAddress.city,
+      s_state: customerData.shippingAddress.state,
+      s_country: customerData.shippingAddress.country,
+      // Billing Address
+      b_address1: customerData.billingAddress.address1,
+      b_address2: customerData.billingAddress.address2,
+      b_street: customerData.billingAddress.address1, // Assuming address1 is street
+      b_postcode: customerData.billingAddress.zip,
+      b_city: customerData.billingAddress.city,
+      b_state: customerData.billingAddress.state,
+      b_country: customerData.billingAddress.country,
     };
 
-    console.log("Creating new customer:", finalCustomerData);
-
-    // Here you would typically make an API call to save the customer
-    // Example: await createCustomerAPI(finalCustomerData);
-
-    Alert.alert(
-      "Success",
-      "Customer has been created successfully!",
-      [
-        {
-          text: "Create Another",
-          onPress: resetForm
-        },
-        {
-          text: "Done",
-          style: "cancel"
+    setLoading(true);
+    try {
+      const response = await post(ENDPOINTS.ADD_CUSTOMER, apiPayload);
+      console.log('Customer created:', response);
+      setLoading(false);
+      Alert.alert(
+        "Success",
+        "Customer has been created successfully!",
+        [
+          {
+            text: "Create Another",
+            onPress: resetForm
+          },
+          {
+            text: "Done",
+            style: "cancel"
+          }
+        ]
+      );
+    } catch (error) {
+      setLoading(false);
+      let errorMessage = 'An unexpected error occurred. Please try again.';
+      if (error && typeof error === 'object') {
+        if (error.message) {
+          errorMessage = error.message;
+        } else if (error.error) {
+          errorMessage = error.error;
+        } else if (typeof error === 'string') {
+          errorMessage = error;
         }
-      ]
-    );
+      }
+      console.error('Error creating customer:', error);
+      Alert.alert('Error', errorMessage);
+    }
   };
 
   const renderCheckbox = (checked, onPress) => (
@@ -391,8 +444,11 @@ export const CreateCustomer = () => {
           <TouchableOpacity
             style={[styles.updateButton, isTablet && styles.updateButtonTablet, { flex: 1 }]}
             onPress={handleCreateCustomer}
+            disabled={loading}
           >
-            <Text style={[styles.updateButtonText, isTablet && styles.updateButtonTextTablet]}>Create Customer</Text>
+            <Text style={[styles.updateButtonText, isTablet && styles.updateButtonTextTablet]}>
+              {loading ? 'Creating...' : 'Create Customer'}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

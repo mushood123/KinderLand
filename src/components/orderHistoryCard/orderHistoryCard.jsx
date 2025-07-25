@@ -33,7 +33,7 @@ export const OrderHistoryCard = ({
 
   const getStatusColor = (orderStatus) => {
     switch (orderStatus) {
-      case "Pending":
+      case ("Pending" || '1'):
         return "#3B82F6";
       case "Shipped":
         return "#F59E0B";
@@ -90,7 +90,7 @@ export const OrderHistoryCard = ({
         </View>
 
         <Text style={[styles.statusText, { color: getStatusColor(status) }, isTablet && styles.statusTextTablet]}>
-          {status}
+          {status === '1' ? 'Pending' : status}
         </Text>
       </View>
     </TouchableOpacity>

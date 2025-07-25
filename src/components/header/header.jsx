@@ -13,6 +13,7 @@ export const Header = ({
   notificationCount = 10,
   onNotificationPress = () => { },
   onProfilePress = () => { },
+  userImage = 'https://abs.twimg.com/favicons/twitter.3.ico'
 }) => {
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -63,7 +64,7 @@ export const Header = ({
         >
           <View style={styles.profileAvatar}>
             <Image
-              source={{ uri: 'https://abs.twimg.com/favicons/twitter.3.ico' }}
+              source={{ uri: userImage }}
               style={styles.avatarImage}
             />
           </View>
