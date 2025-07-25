@@ -1,79 +1,102 @@
-import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native"
-import { useRoute, useNavigation } from "@react-navigation/native"
-import { styles } from "./styles"
-import { ProductInventoryCard, CartSummaryCard } from "../../../components"
-import { cartProducts } from "./data.js"
+import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import { styles } from './styles';
+import { ProductInventoryCard, CartSummaryCard } from '../../../components';
+import { cartProducts } from './data.js';
 
 export const OrderCart = () => {
-  const route = useRoute()
-  const navigation = useNavigation()
-  const { product, quantities, selectedSizes, selectedQuantity } = route.params || {}
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { product, quantities, selectedSizes, selectedQuantity } =
+    route.params || {};
 
-  console.log("Product", product)
-  console.log("Quantities", quantities)
-  console.log("Selected Sizes", selectedSizes)
-  console.log("Selected Quantity", selectedQuantity)
+  console.log('Product', product);
+  console.log('Quantities', quantities);
+  console.log('Selected Sizes', selectedSizes);
+  console.log('Selected Quantity', selectedQuantity);
 
   // Sample cart data - in real app, this would come from state/context
 
-
   // Calculate totals from all products
   const calculateCartTotals = () => {
-    let totalPairs = 0
-    let totalValue = 0
+    let totalPairs = 0;
+    let totalValue = 0;
 
-    cartProducts.forEach((product) => {
-      product.sizeQuantities.forEach((sizeQty) => {
-        totalPairs += sizeQty.quantity
+    cartProducts.forEach(product => {
+      product.sizeQuantities.forEach(sizeQty => {
+        totalPairs += sizeQty.quantity;
 
         // Find the appropriate price tier for this size
-        const tier = product.priceTiers.find((tier) => {
-          const [min, max] = tier.sizeRange.split("-").map((s) => Number.parseInt(s.trim()))
-          return sizeQty.size >= min && sizeQty.size <= max
-        })
+        const tier = product.priceTiers.find(tier => {
+          const [min, max] = tier.sizeRange
+            .split('-')
+            .map(s => Number.parseInt(s.trim()));
+          return sizeQty.size >= min && sizeQty.size <= max;
+        });
 
         if (tier) {
-          totalValue += sizeQty.quantity * tier.price
+          totalValue += sizeQty.quantity * tier.price;
         }
-      })
-    })
+      });
+    });
 
-    return { totalPairs, totalValue }
-  }
+    return { totalPairs, totalValue };
+  };
 
-  const { totalPairs, totalValue } = calculateCartTotals()
+  const { totalPairs, totalValue } = calculateCartTotals();
 
-  const handleDeleteProduct = (productName) => {
-    console.log("Delete product:", productName)
-    Alert.alert("Delete Product", `Are you sure you want to remove ${productName} from the cart?`, [
-      { text: "Cancel", style: "cancel" },
-      { text: "Delete", style: "destructive", onPress: () => console.log("Product deleted") },
-    ])
-  }
+  const handleDeleteProduct = productName => {
+    console.log('Delete product:', productName);
+    Alert.alert(
+      'Delete Product',
+      `Are you sure you want to remove ${productName} from the cart?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => console.log('Product deleted'),
+        },
+      ],
+    );
+  };
 
   const handleQuantityChange = (productName, size, quantity) => {
-    console.log(`Product: ${productName}, Size: ${size}, Quantity changed to:`, quantity)
+    console.log(
+      `Product: ${productName}, Size: ${size}, Quantity changed to:`,
+      quantity,
+    );
     // In real app, update cart state here
-  }
+  };
 
-  const handleCardPress = (productName) => {
-    console.log("Product inventory card pressed:", productName)
-  }
+  const handleCardPress = productName => {
+    console.log('Product inventory card pressed:', productName);
+  };
 
   const handleNextPress = () => {
-    console.log("Proceeding to next step with cart totals:", { totalPairs, totalValue })
-    Alert.alert("Next Step", "Proceeding to checkout or next screen", [
-      { text: "OK", onPress: () => { navigation.navigate("Shipping Info") } },
-    ])
-  }
+    console.log('Proceeding to next step with cart totals:', {
+      totalPairs,
+      totalValue,
+    });
+    // Generate a realistic order number
+    const orderNumber = Math.floor(Math.random() * 9000) + 1000; // 4-digit number
+    navigation.navigate('Digital Signature', {
+      orderId: orderNumber.toString(),
+    });
+  };
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header Section */}
         <View style={styles.headerSection}>
           <Text style={styles.headerTitle}>Selected Items</Text>
-          <Text style={styles.headerSubtitle}>These items are currently added into order.</Text>
+          <Text style={styles.headerSubtitle}>
+            These items are currently added into order.
+          </Text>
         </View>
 
         {/* Items in Cart Section */}
@@ -91,7 +114,9 @@ export const OrderCart = () => {
               sizeQuantities={product.sizeQuantities}
               priceTiers={product.priceTiers}
               onDeletePress={() => handleDeleteProduct(product.productName)}
-              onQuantityChange={(size, quantity) => handleQuantityChange(product.productName, size, quantity)}
+              onQuantityChange={(size, quantity) =>
+                handleQuantityChange(product.productName, size, quantity)
+              }
               onCardPress={() => handleCardPress(product.productName)}
             />
           ))}
@@ -100,16 +125,25 @@ export const OrderCart = () => {
         {/* Summary Section */}
         <View style={styles.summarySection}>
           <Text style={styles.sectionTitle}>Summary</Text>
-          <CartSummaryCard unitTotal={totalPairs} unitLabel="pairs" grandTotal={totalValue} currency="$" />
+          <CartSummaryCard
+            unitTotal={totalPairs}
+            unitLabel="pairs"
+            grandTotal={totalValue}
+            currency="$"
+          />
         </View>
       </ScrollView>
 
       {/* Next Button */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.nextButton} onPress={handleNextPress} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={styles.nextButton}
+          onPress={handleNextPress}
+          activeOpacity={0.8}
+        >
           <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
     </View>
-  )
-}
+  );
+};

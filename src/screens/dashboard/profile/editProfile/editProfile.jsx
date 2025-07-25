@@ -16,12 +16,11 @@ import { styles } from './styles';
 import { ENDPOINTS, get, post, put, del } from '../../../../api';
 import { UserContext } from '../../../../context';
 
-
 export const EditProfile = () => {
   const { width } = Dimensions.get('window');
   const isTablet = width > 768;
   const isSmallScreen = width < 400;
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   console.log('user', user);
   const [formData, setFormData] = useState({
     firstname: user?.firstname,
@@ -72,7 +71,12 @@ export const EditProfile = () => {
     console.log('passwordData', passwordData);
     console.log('showPasswordFields', showPasswordFields);
 
-    const isValid = validateForm(setErrors, formData, showPasswordFields, passwordData);
+    const isValid = validateForm(
+      setErrors,
+      formData,
+      showPasswordFields,
+      passwordData,
+    );
     console.log('Validation result:', isValid);
 
     if (isValid) {
@@ -98,12 +102,17 @@ export const EditProfile = () => {
         const res = await post(url, requestData);
         console.log('API Response:', res);
 
+        // Update user context with new data
+        const updatedUser = { ...user, ...formData };
+        setUser(updatedUser);
+        console.log('User context updated with new data:', updatedUser);
+
         Alert.alert('Success', 'Profile updated successfully!');
       } catch (error) {
         console.error('API Error:', error);
         Alert.alert(
           'Error',
-          error.message || 'Failed to update profile. Please try again.'
+          error.message || 'Failed to update profile. Please try again.',
         );
       }
     } else {
@@ -111,68 +120,82 @@ export const EditProfile = () => {
     }
   };
 
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.content, isTablet && styles.contentTablet]}
+        contentContainerStyle={[
+          styles.content,
+          isTablet && styles.contentTablet,
+        ]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.profileSection}>
-          <View style={[styles.profileImageContainer, isTablet && styles.profileImageContainerTablet]}>
+          <View
+            style={[
+              styles.profileImageContainer,
+              isTablet && styles.profileImageContainerTablet,
+            ]}
+          >
             <Image
               source={{ uri: user?.image }}
-              style={[styles.profileImage, isTablet && styles.profileImageTablet]}
+              style={[
+                styles.profileImage,
+                isTablet && styles.profileImageTablet,
+              ]}
               resizeMode="cover"
             />
           </View>
         </View>
 
         <View style={styles.formContainer}>
-          <View style={[
-            styles.row,
-            isSmallScreen && styles.rowSmall,
-            isTablet && styles.rowTablet
-          ]}>
+          <View
+            style={[
+              styles.row,
+              isSmallScreen && styles.rowSmall,
+              isTablet && styles.rowTablet,
+            ]}
+          >
             <View style={[styles.halfWidth, isSmallScreen && styles.fullWidth]}>
               {renderInput(
                 'First Name',
                 formData.firstname,
-                (text) => handleInputChange('firstname', text),
-                errors.firstname
+                text => handleInputChange('firstname', text),
+                errors.firstname,
               )}
             </View>
             <View style={[styles.halfWidth, isSmallScreen && styles.fullWidth]}>
               {renderInput(
                 'Last Name',
                 formData.lastname,
-                (text) => handleInputChange('lastname', text),
-                errors.lastname
+                text => handleInputChange('lastname', text),
+                errors.lastname,
               )}
             </View>
           </View>
 
-          <View style={[
-            styles.row,
-            isSmallScreen && styles.rowSmall,
-            isTablet && styles.rowTablet
-          ]}>
+          <View
+            style={[
+              styles.row,
+              isSmallScreen && styles.rowSmall,
+              isTablet && styles.rowTablet,
+            ]}
+          >
             <View style={[styles.halfWidth, isSmallScreen && styles.fullWidth]}>
               {renderInput(
                 'Company/Shop Name',
                 formData.storeName,
-                (text) => handleInputChange('storeName', text),
-                errors.storeName
+                text => handleInputChange('storeName', text),
+                errors.storeName,
               )}
             </View>
             <View style={[styles.halfWidth, isSmallScreen && styles.fullWidth]}>
               {renderInput(
                 'Email',
                 formData.email,
-                (text) => handleInputChange('email', text),
+                text => handleInputChange('email', text),
                 errors.email,
-                'email-address'
+                'email-address',
               )}
             </View>
           </View>
@@ -180,9 +203,9 @@ export const EditProfile = () => {
           {renderInput(
             'Phone',
             formData.phone,
-            (text) => handleInputChange('phone', text),
+            text => handleInputChange('phone', text),
             errors.phone,
-            'phone-pad'
+            'phone-pad',
           )}
 
           {showPasswordFields && (
@@ -190,24 +213,24 @@ export const EditProfile = () => {
               {renderInput(
                 'Password',
                 passwordData.password,
-                (text) => handlePasswordChange('password', text),
+                text => handlePasswordChange('password', text),
                 errors.password,
                 'default',
                 true,
                 true,
                 showPreviousPassword,
-                () => setShowPreviousPassword(!showPreviousPassword)
+                () => setShowPreviousPassword(!showPreviousPassword),
               )}
               {renderInput(
                 'Confirm Password',
                 passwordData.confirmPassword,
-                (text) => handlePasswordChange('confirmPassword', text),
+                text => handlePasswordChange('confirmPassword', text),
                 errors.confirmPassword,
                 'default',
                 true,
                 true,
                 showNewPassword,
-                () => setShowNewPassword(!showNewPassword)
+                () => setShowNewPassword(!showNewPassword),
               )}
             </View>
           )}
@@ -216,8 +239,15 @@ export const EditProfile = () => {
             style={styles.changePasswordContainer}
             onPress={handleChangePassword}
           >
-            <Text style={[styles.changePasswordText, isTablet && styles.changePasswordTextTablet]}>
-              {showPasswordFields ? 'Cancel Password Change' : 'Change Password'}
+            <Text
+              style={[
+                styles.changePasswordText,
+                isTablet && styles.changePasswordTextTablet,
+              ]}
+            >
+              {showPasswordFields
+                ? 'Cancel Password Change'
+                : 'Change Password'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -227,7 +257,12 @@ export const EditProfile = () => {
           onPress={handleUpdate}
           activeOpacity={0.8}
         >
-          <Text style={[styles.updateButtonText, isTablet && styles.updateButtonTextTablet]}>
+          <Text
+            style={[
+              styles.updateButtonText,
+              isTablet && styles.updateButtonTextTablet,
+            ]}
+          >
             Update
           </Text>
         </TouchableOpacity>
@@ -235,6 +270,3 @@ export const EditProfile = () => {
     </SafeAreaView>
   );
 };
-
-
-
