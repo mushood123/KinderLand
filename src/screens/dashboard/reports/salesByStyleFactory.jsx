@@ -10,7 +10,7 @@ import {
   ScrollView,
   Modal,
 } from 'react-native';
-// import DatePicker from 'react-native-date-picker';
+import DatePicker from 'react-native-date-picker';
 import { styles } from './styles';
 import { UserContext } from '../../../context';
 import { ENDPOINTS, get, post } from '../../../api';
@@ -60,10 +60,8 @@ export const SalesByStyleFactory = () => {
       const response = await axiosInstance.post(
         ENDPOINTS.FACTORY_STYLE_BY_STORE_NAME,
         {
-          StartDate: '05/02/2008',
-          EndDate: '23/07/2025',
-          // StartDate: formatDateForAPI(startDate),
-          // EndDate: formatDateForAPI(endDate),
+          StartDate: formatDateForAPI(startDate),
+          EndDate: formatDateForAPI(endDate),
         },
         {
           headers: {
@@ -71,7 +69,7 @@ export const SalesByStyleFactory = () => {
           },
         },
       );
-      setCustomers(response.data.mainArray || []);
+      setCustomers(response.data || []);
     } catch (error) {
       console.error('Error fetching total sales:', error);
       Alert.alert('Error', 'Failed to fetch sales data');
@@ -101,30 +99,25 @@ export const SalesByStyleFactory = () => {
       : b.storeName.localeCompare(a.storeName);
   });
 
-  // Subtotals
-  const totalPairs = filteredData.reduce(
-    (sum, item) => sum + (item.PairsSold || 0),
-    0,
-  );
-  const totalAmount = filteredData.reduce(
-    (sum, item) => sum + (item.Totalsales || 0),
-    0,
-  );
-
   const renderHeader = () => (
     <View style={[styles.tableHeader, { marginTop: 8 }]}>
-      <Text style={[styles.headerCell, { flex: 2 }]}>Store Name</Text>
-      <Text style={styles.headerCell}>Order Number</Text>
-      <Text style={styles.headerCell}>Order Status</Text>
+      <Text style={[styles.headerCell, { paddingRight: 70 }]}>Store Name</Text>
+      <Text style={[styles.headerCell, { paddingRight: 30 }]}>Style</Text>
+      <Text style={[styles.headerCell, { paddingLeft: 30 }]}>Sku</Text>
+      <Text style={styles.headerCell}>Color</Text>
+      <Text style={styles.headerCell}>Pairs Sold</Text>
     </View>
   );
 
   const renderItem = ({ item }) => (
     <View style={styles.tableRow}>
-      <Text style={[styles.cell, { flex: 2 }]}>{item.storeName}</Text>
-      <Text style={styles.cell}>{item.PairsSold}</Text>
-      <Text style={styles.cell}>{commafunc(item.Totalsales)}</Text>
-      <Text style={styles.cell}>{item.orderDate}</Text>
+      <Text style={[styles.cell, { paddingRight: 80 }]}>{item.storeName}</Text>
+      <Text style={[styles.cell, { paddingRight: 80 }]}>
+        {item.StyleFactory}
+      </Text>
+      <Text style={styles.cell}>{item['SKU']}</Text>
+      <Text style={[styles.cell, { paddingRight: 60 }]}>{item.color}</Text>
+      <Text style={styles.cell}>{item.Pairs}</Text>
     </View>
   );
 
@@ -291,7 +284,7 @@ export const SalesByStyleFactory = () => {
       </View>
 
       {/* Date Pickers */}
-      {/* <DatePicker
+      <DatePicker
         modal
         open={showStartDatePicker}
         date={startDate}
@@ -303,9 +296,9 @@ export const SalesByStyleFactory = () => {
         onCancel={() => {
           setShowStartDatePicker(false);
         }}
-      /> */}
+      />
 
-      {/* <DatePicker
+      <DatePicker
         modal
         open={showEndDatePicker}
         date={endDate}
@@ -317,7 +310,7 @@ export const SalesByStyleFactory = () => {
         onCancel={() => {
           setShowEndDatePicker(false);
         }}
-      /> */}
+      />
 
       {/* Sort Dropdown Modal */}
       <Modal

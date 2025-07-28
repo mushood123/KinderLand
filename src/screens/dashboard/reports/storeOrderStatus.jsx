@@ -10,7 +10,7 @@ import {
   ScrollView,
   Modal,
 } from 'react-native';
-// import DatePicker from 'react-native-date-picker';
+import DatePicker from 'react-native-date-picker';
 import { styles } from './styles';
 import { UserContext } from '../../../context';
 import { ENDPOINTS, get, post } from '../../../api';
@@ -60,11 +60,8 @@ export const StoreOrderStatus = () => {
       const response = await axiosInstance.post(
         ENDPOINTS.STORE_ORDER_STATUS,
         {
-          StartDate: '05/02/2008',
-          EndDate: '23/07/2025',
-
-          // StartDate: formatDateForAPI(startDate),
-          // EndDate: formatDateForAPI(endDate),
+          StartDate: formatDateForAPI(startDate),
+          EndDate: formatDateForAPI(endDate),
         },
         {
           headers: {
@@ -72,7 +69,7 @@ export const StoreOrderStatus = () => {
           },
         },
       );
-      setCustomers(response.data.mainArray || []);
+      setCustomers(response.data || []);
     } catch (error) {
       console.error('Error fetching total sales:', error);
       Alert.alert('Error', 'Failed to fetch sales data');
@@ -102,16 +99,6 @@ export const StoreOrderStatus = () => {
       : b.storeName.localeCompare(a.storeName);
   });
 
-  // Subtotals
-  const totalPairs = filteredData.reduce(
-    (sum, item) => sum + (item.PairsSold || 0),
-    0,
-  );
-  const totalAmount = filteredData.reduce(
-    (sum, item) => sum + (item.Totalsales || 0),
-    0,
-  );
-
   const renderHeader = () => (
     <View style={[styles.tableHeader, { marginTop: 8 }]}>
       <Text style={[styles.headerCell, { flex: 2 }]}>Store Name</Text>
@@ -122,10 +109,19 @@ export const StoreOrderStatus = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.tableRow}>
-      <Text style={[styles.cell, { flex: 2 }]}>{item.storeName}</Text>
-      <Text style={styles.cell}>{item.PairsSold}</Text>
-      <Text style={styles.cell}>{commafunc(item.Totalsales)}</Text>
-      <Text style={styles.cell}>{item.orderDate}</Text>
+      <Text style={[styles.cell, { flex: 2 }]}>{item.StoreName}</Text>
+      <Text style={styles.cell}>{item.OrderNumber}</Text>
+      <View style={styles.cell}>
+        {item.OrderStatus == '1' ? (
+          <Text style={{ color: 'green', fontSize: 12 }}>Active</Text>
+        ) : item.OrderStatus == '2' ? (
+          <Text style={{ color: 'blue', fontSize: 12 }}>Completed</Text>
+        ) : item.OrderStatus == '0' ? (
+          <Text style={{ color: 'red', fontSize: 12 }}>Canceled</Text>
+        ) : (
+          <Text style={{ color: 'red', fontSize: 12 }}>Not Available</Text>
+        )}
+      </View>
     </View>
   );
 
@@ -292,7 +288,7 @@ export const StoreOrderStatus = () => {
       </View>
 
       {/* Date Pickers */}
-      {/* <DatePicker
+      <DatePicker
         modal
         open={showStartDatePicker}
         date={startDate}
@@ -304,9 +300,9 @@ export const StoreOrderStatus = () => {
         onCancel={() => {
           setShowStartDatePicker(false);
         }}
-      /> */}
+      />
 
-      {/* <DatePicker
+      <DatePicker
         modal
         open={showEndDatePicker}
         date={endDate}
@@ -318,7 +314,7 @@ export const StoreOrderStatus = () => {
         onCancel={() => {
           setShowEndDatePicker(false);
         }}
-      /> */}
+      />
 
       {/* Sort Dropdown Modal */}
       <Modal

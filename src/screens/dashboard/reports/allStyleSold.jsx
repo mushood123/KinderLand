@@ -90,7 +90,6 @@ export const AllStyleSold = () => {
 
   let filteredData = customers.filter(item => {
     if (filter === '') return true;
-    console.log('ITEMMMM >>>', item);
     return (
       (item.style && item.style.toLowerCase().includes(filter.toLowerCase())) ||
       (item.sku && item.sku.toLowerCase().includes(filter.toLowerCase()))

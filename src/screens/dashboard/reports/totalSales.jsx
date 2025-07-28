@@ -10,7 +10,7 @@ import {
   ScrollView,
   Modal,
 } from 'react-native';
-// import DatePicker from 'react-native-date-picker';
+import DatePicker from 'react-native-date-picker';
 import { styles } from './styles';
 import { UserContext } from '../../../context';
 import { ENDPOINTS, get, post } from '../../../api';
@@ -60,10 +60,8 @@ export const TotalSales = () => {
       const response = await axiosInstance.post(
         ENDPOINTS.TOTAL_SALES_BY_DATE,
         {
-          StartDate: '05/02/2008',
-          EndDate: '23/07/2025',
-          // StartDate: formatDateForAPI(startDate),
-          // EndDate: formatDateForAPI(endDate),
+          StartDate: formatDateForAPI(startDate),
+          EndDate: formatDateForAPI(endDate),
         },
         {
           headers: {
@@ -71,8 +69,6 @@ export const TotalSales = () => {
           },
         },
       );
-
-      console.log('RESPONSE >>> ', response);
 
       setCustomers(response.data || []);
     } catch (error) {
@@ -131,15 +127,27 @@ export const TotalSales = () => {
   );
 
   const renderFooter = () => (
-    <View style={styles.subtotalRow}>
-      <Text style={[styles.cell, { flex: 2, fontWeight: 'bold' }]}>
-        Subtotal
+    <View style={[styles.subtotalRow, { justifyContent: 'space-around' }]}>
+      <Text style={[styles.cell, { fontWeight: 'bold' }]}>Subtotal</Text>
+      <Text
+        style={[
+          styles.cell,
+          { fontWeight: 'bold', textAlign: 'center', paddingLeft: 30 },
+        ]}
+      >
+        {totalPairs}
       </Text>
-      <Text style={[styles.cell, { fontWeight: 'bold' }]}>{totalPairs}</Text>
-      <Text style={[styles.cell, { fontWeight: 'bold' }]}>
+      <Text
+        style={[
+          styles.cell,
+          {
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+        ]}
+      >
         {commafunc(totalAmount)}
       </Text>
-      <Text style={styles.cell}></Text>
     </View>
   );
 
@@ -306,7 +314,7 @@ export const TotalSales = () => {
       </View>
 
       {/* Date Pickers */}
-      {/* <DatePicker
+      <DatePicker
         modal
         open={showStartDatePicker}
         date={startDate}
@@ -318,9 +326,9 @@ export const TotalSales = () => {
         onCancel={() => {
           setShowStartDatePicker(false);
         }}
-      /> */}
+      />
 
-      {/* <DatePicker
+      <DatePicker
         modal
         open={showEndDatePicker}
         date={endDate}
@@ -332,7 +340,7 @@ export const TotalSales = () => {
         onCancel={() => {
           setShowEndDatePicker(false);
         }}
-      /> */}
+      />
 
       {/* Sort Dropdown Modal */}
       <Modal

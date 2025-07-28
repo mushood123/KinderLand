@@ -6,7 +6,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "ios-15": "react-native run-ios --simulator='iPhone 15'",
-    "ios-air": "react-native run-ios --simulator='iPad Air (5th generation)'",
+    "ios-air": "react-native run-ios --simulator='iPad Air (5th generation) (iOS 16.4)'",
     "ios-ipad": "react-native run-ios --simulator='iPad (10th generation)'",
     "ios-mini": "react-native run-ios --simulator='iPad mini (6th generation)'",
     "clean-cache": "rm -rf ~/Library/Developer/Xcode/DerivedData",
