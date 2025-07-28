@@ -8,4 +8,5 @@ export const ENDPOINTS = {
   UPDATE_CUSTOMER: '/update-customer/:id',
   DELETE_ORDER: '/delete-order',
   GET_ORDER_DETAILS: '/get-order-details',
+  CREATE_ORDER: '/create-order',
 };

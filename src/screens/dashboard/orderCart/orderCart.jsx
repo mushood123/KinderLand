@@ -1,23 +1,57 @@
+import React, { useContext } from "react"
 import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native"
 import { useRoute, useNavigation } from "@react-navigation/native"
 import { styles } from "./styles"
 import { ProductInventoryCard, CartSummaryCard } from "../../../components"
-import { cartProducts } from "./data.js"
+import { CartContext } from "../../../context"
 
 export const OrderCart = () => {
   const route = useRoute()
   const navigation = useNavigation()
-  const { product, quantities, selectedSizes, selectedQuantity } = route.params || {}
-
+  const { cart, setCart } = useContext(CartContext)
+  const { product, quantities, selectedSizes, selectedQuantity, customer } = route.params || {}
   console.log("Product", product)
   console.log("Quantities", quantities)
   console.log("Selected Sizes", selectedSizes)
   console.log("Selected Quantity", selectedQuantity)
+  console.log("Customer", customer)
 
-  // Sample cart data - in real app, this would come from state/context
+  const transformProductData = () => {
+    if (!product || !quantities) return []
 
+    const sizeQuantities = Object.entries(quantities).map(([size, quantity]) => ({
+      size: parseInt(size),
+      quantity: quantity
+    })).filter(item => item.quantity > 0)
 
-  // Calculate totals from all products
+    const priceTiers = []
+    if (product.pricing) {
+      if (product.pricing.sizeRange1 && product.pricing.price1) {
+        priceTiers.push({
+          sizeRange: product.pricing.sizeRange1,
+          price: parseFloat(product.pricing.price1.replace('$', ''))
+        })
+      }
+      if (product.pricing.sizeRange2 && product.pricing.price2) {
+        priceTiers.push({
+          sizeRange: product.pricing.sizeRange2,
+          price: parseFloat(product.pricing.price2.replace('$', ''))
+        })
+      }
+    }
+
+    return [{
+      productName: product.productName,
+      productCode: product.productCode,
+      description: product.description,
+      imageUrl: product.imageUrl,
+      sizeQuantities: sizeQuantities,
+      priceTiers: priceTiers
+    }]
+  }
+
+  const cartProducts = transformProductData()
+
   const calculateCartTotals = () => {
     let totalPairs = 0
     let totalValue = 0
@@ -26,7 +60,6 @@ export const OrderCart = () => {
       product.sizeQuantities.forEach((sizeQty) => {
         totalPairs += sizeQty.quantity
 
-        // Find the appropriate price tier for this size
         const tier = product.priceTiers.find((tier) => {
           const [min, max] = tier.sizeRange.split("-").map((s) => Number.parseInt(s.trim()))
           return sizeQty.size >= min && sizeQty.size <= max
@@ -53,7 +86,6 @@ export const OrderCart = () => {
 
   const handleQuantityChange = (productName, size, quantity) => {
     console.log(`Product: ${productName}, Size: ${size}, Quantity changed to:`, quantity)
-    // In real app, update cart state here
   }
 
   const handleCardPress = (productName) => {
@@ -62,25 +94,62 @@ export const OrderCart = () => {
 
   const handleNextPress = () => {
     console.log("Proceeding to next step with cart totals:", { totalPairs, totalValue })
+
+    const productData = {}
+
+    cartProducts.forEach((product, index) => {
+      const productKey = `shoe${index + 1}`
+
+      productData[productKey] = product.sizeQuantities.map((sizeQty) => {
+        const tier = product.priceTiers.find((tier) => {
+          const [min, max] = tier.sizeRange.split("-").map((s) => Number.parseInt(s.trim()))
+          return sizeQty.size >= min && sizeQty.size <= max
+        })
+
+        return {
+          size: sizeQty.size,
+          quantity: sizeQty.quantity,
+          price: tier ? tier.price : 0
+        }
+      })
+    })
+
+    const cartData = {
+      products: cartProducts,
+      totals: { totalPairs, totalValue },
+      customer: customer,
+      productData: productData,
+      product: product,
+    }
+    setCart(cartData)
+
     Alert.alert("Next Step", "Proceeding to checkout or next screen", [
-      { text: "OK", onPress: () => { navigation.navigate("Shipping Info") } },
+      { text: "OK", onPress: () => { navigation.navigate("Shipping Info", { cartData, product, quantities, selectedSizes, selectedQuantity, customer }) } },
     ])
+  }
+
+  if (cartProducts.length === 0) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.headerSection}>
+          <Text style={styles.headerTitle}>Selected Items</Text>
+          <Text style={styles.headerSubtitle}>No items in cart</Text>
+        </View>
+      </View>
+    )
   }
 
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Header Section */}
         <View style={styles.headerSection}>
           <Text style={styles.headerTitle}>Selected Items</Text>
           <Text style={styles.headerSubtitle}>These items are currently added into order.</Text>
         </View>
 
-        {/* Items in Cart Section */}
         <View style={styles.itemsSection}>
           <Text style={styles.sectionTitle}>Items in Cart</Text>
 
-          {/* Product Cards */}
           {cartProducts.map((product, index) => (
             <ProductInventoryCard
               key={`${product.productCode}-${index}`}
@@ -97,14 +166,12 @@ export const OrderCart = () => {
           ))}
         </View>
 
-        {/* Summary Section */}
         <View style={styles.summarySection}>
           <Text style={styles.sectionTitle}>Summary</Text>
           <CartSummaryCard unitTotal={totalPairs} unitLabel="pairs" grandTotal={totalValue} currency="$" />
         </View>
       </ScrollView>
 
-      {/* Next Button */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.nextButton} onPress={handleNextPress} activeOpacity={0.8}>
           <Text style={styles.nextButtonText}>Next</Text>

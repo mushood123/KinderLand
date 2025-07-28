@@ -44,7 +44,7 @@ export const CustomerInformation = () => {
       console.log('response', response)
       setOrders(response.Orders || []);
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      console.log('Error fetching orders:', error);
       setOrders([]);
     } finally {
       setLoading(false);
@@ -82,7 +82,7 @@ export const CustomerInformation = () => {
       setVisible(false);
       setOrder(null);
     } catch (error) {
-      console.error('Error deleting order:', error);
+      console.log('Error deleting order:', error);
       // You might want to show an error message to the user here
     }
   };

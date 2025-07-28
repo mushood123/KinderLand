@@ -18,7 +18,7 @@ export const UserProvider = ({ children }) => {
           console.log('User data loaded from storage:', parsedUser);
         }
       } catch (error) {
-        console.error('Error loading user data:', error);
+        console.log('Error loading user data:', error);
       } finally {
         setLoading(false);
       }
@@ -39,7 +39,7 @@ export const UserProvider = ({ children }) => {
         console.log('User data removed from storage');
       }
     } catch (error) {
-      console.error('Error saving user data:', error);
+      console.log('Error saving user data:', error);
     }
   };
 
@@ -50,7 +50,7 @@ export const UserProvider = ({ children }) => {
       await AsyncStorage.removeItem('userData');
       console.log('User data cleared from storage');
     } catch (error) {
-      console.error('Error clearing user data:', error);
+      console.log('Error clearing user data:', error);
     }
   };
 

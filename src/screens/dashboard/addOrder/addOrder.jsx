@@ -14,6 +14,7 @@ export const AddOrder = () => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const navigation = useNavigation();
 
   // Fetch customers from API
@@ -46,7 +47,7 @@ export const AddOrder = () => {
 
       setCustomers(mappedCustomers);
     } catch (err) {
-      console.error('Error fetching customers:', err);
+      console.log('Error fetching customers:', err);
       setError('Failed to load customers. Please try again.');
       Alert.alert('Error', 'Failed to load customers. Please try again.');
     } finally {
@@ -116,7 +117,8 @@ export const AddOrder = () => {
 
   const handleCustomerPress = (customer) => {
     console.log('customer selected:', customer);
-    navigation.navigate('Select Product', customer)
+    setSelectedCustomer(customer);
+    navigation.navigate('Select Product', { customer })
   }
 
   const handleSearch = (text) => {

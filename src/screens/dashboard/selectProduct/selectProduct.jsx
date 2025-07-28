@@ -4,16 +4,22 @@ import { styles } from "./styles";
 import { filterOptions } from "./data";
 import { useLayoutEffect, useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import { get, ENDPOINTS } from "../../../api";
 
 export const SelectProduct = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { customer } = route.params;
+  console.log("customer from select product", customer)
+
   const [filterModal, setFilterModal] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(customer);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -78,7 +84,7 @@ export const SelectProduct = () => {
 
       setProducts(mappedProducts);
     } catch (err) {
-      console.error('Error fetching products:', err);
+      console.log('Error fetching products:', err);
       setError('Failed to load products. Please try again.');
     } finally {
       setLoading(false);
@@ -97,7 +103,8 @@ export const SelectProduct = () => {
 
   const handleProductPress = (item) => {
     setSelectedProduct(item);
-    navigation.navigate('Product Total', { product: item });
+    console.log("selected product from select product", selectedProduct)
+    navigation.navigate('Product Total', { product: item, customer: selectedCustomer });
     console.log("Selected product:", item?.productName);
   };
 

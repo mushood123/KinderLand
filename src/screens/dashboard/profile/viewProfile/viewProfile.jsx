@@ -82,7 +82,7 @@ export const ViewProfile = () => {
             if (typeof handleLogout === 'function') {
               handleLogout();
             } else {
-              console.error('handleLogout is not a function:', handleLogout);
+              console.log('handleLogout is not a function:', handleLogout);
             }
           }}
           activeOpacity={0.8}

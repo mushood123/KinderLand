@@ -86,11 +86,11 @@ export const Customers = () => {
           const transformedData = transformApiData(response);
           setApiCustomers(transformedData);
         } else {
-          console.error('Invalid response format:', response);
+          console.log('Invalid response format:', response);
           setApiCustomers([]);
         }
       } catch (error) {
-        console.error('Error fetching customers:', error);
+        console.log('Error fetching customers:', error);
         setApiCustomers([]);
       } finally {
         setLoading(false);

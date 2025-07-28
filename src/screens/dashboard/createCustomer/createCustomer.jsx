@@ -200,7 +200,7 @@ export const CreateCustomer = () => {
           errorMessage = error;
         }
       }
-      console.error('Error creating customer:', error);
+      console.log('Error creating customer:', error);
       Alert.alert('Error', errorMessage);
     }
   };

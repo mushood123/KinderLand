@@ -1,7 +1,7 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'react-native';
-import { UserProvider, UserContext } from './src/context';
+import { UserProvider, UserContext, CartProvider, ShippingProvider } from './src/context';
 import { LogoutProvider } from './src/context/logoutContext';
 import { useEffect, useState, useCallback, useContext } from 'react';
 import { navigation } from './src/navigations';
@@ -19,7 +19,6 @@ function AppContent() {
       console.log('Token fetched:', storedToken);
       console.log('Token type:', typeof storedToken);
       console.log('Token truthy check:', !!storedToken);
-      // Only set token if it's not null, undefined, or empty string
       if (storedToken && storedToken.trim() !== '') {
         console.log('Setting valid token:', storedToken);
         setToken(storedToken);
@@ -28,24 +27,21 @@ function AppContent() {
         setToken(null);
       }
     } catch (error) {
-      console.error('Error fetching token:', error);
+      console.log('Error fetching token:', error);
       setToken(null);
     }
   };
 
-  // Fetch token on app start
   useEffect(() => {
     checkToken();
   }, []);
 
-  // Monitor token changes and force re-render
   useEffect(() => {
     console.log('Token state changed to:', token);
     console.log('Token type after change:', typeof token);
     console.log('Token truthy check after change:', !!token);
     console.log('Current render key:', renderKey);
 
-    // Force a re-render when token changes
     setRenderKey(prev => {
       console.log('Incrementing render key from', prev, 'to', prev + 1);
       return prev + 1;
@@ -61,22 +57,19 @@ function AppContent() {
       await AsyncStorage.removeItem('token');
       console.log('Token removed from AsyncStorage');
 
-      // Clear user data from context
       await clearUser();
       console.log('User data cleared from context');
 
-      // Force a re-render by incrementing render key first
       setRenderKey(prev => prev + 1);
       console.log('Render key incremented');
 
       setToken(null);
       console.log('setToken(null) called');
 
-      // Double-check that token was actually removed
       const checkTokenAfterLogout = await AsyncStorage.getItem('token');
       console.log('Token check after logout:', checkTokenAfterLogout);
     } catch (error) {
-      console.error('Error removing token:', error);
+      console.log('Error removing token:', error);
     }
   }, [clearUser]);
 
@@ -103,7 +96,11 @@ function AppContent() {
 function App() {
   return (
     <UserProvider>
-      <AppContent />
+      <CartProvider>
+        <ShippingProvider>
+          <AppContent />
+        </ShippingProvider>
+      </CartProvider>
     </UserProvider>
   );
 }

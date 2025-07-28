@@ -14,7 +14,6 @@ axiosInstance.interceptors.request.use(
     const token = await AsyncStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('token from api call ', token)
     }
     return config;
   },

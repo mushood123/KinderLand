@@ -21,20 +21,24 @@ export const SizeCard = ({
   };
 
   const renderPriceInfo = () => {
+    // Convert price to number, handle edge cases
+    const price = typeof item.price === 'string' ? parseFloat(item.price.replace(/[^0-9.-]/g, '')) : Number(item.price);
+    const safePrice = isNaN(price) ? 0 : price;
+
     if (hasQuantity && currentQuantity > 1) {
       return (
         <View style={styles.priceContainer}>
           <Text style={styles.totalPrice}>
-            $ {(item.price * currentQuantity).toFixed(2)} x {currentQuantity}
+            $ {(safePrice * currentQuantity).toFixed(2)} x {currentQuantity}
           </Text>
-          <Text style={styles.unitPrice}>$ {item.price.toFixed(2)}</Text>
+          <Text style={styles.unitPrice}>$ {safePrice.toFixed(2)}</Text>
         </View>
       );
     }
 
     return (
       <View style={styles.priceContainer}>
-        <Text style={styles.unitPrice}>$ {item.price.toFixed(2)}</Text>
+        <Text style={styles.unitPrice}>$ {safePrice.toFixed(2)}</Text>
       </View>
     );
   };

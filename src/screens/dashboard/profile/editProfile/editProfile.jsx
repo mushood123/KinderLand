@@ -100,7 +100,7 @@ export const EditProfile = () => {
 
         Alert.alert('Success', 'Profile updated successfully!');
       } catch (error) {
-        console.error('API Error:', error);
+        console.log('API Error:', error);
         Alert.alert(
           'Error',
           error.message || 'Failed to update profile. Please try again.'

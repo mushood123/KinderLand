@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -12,27 +12,34 @@ import {
   FlatList,
 } from "react-native";
 import { styles } from "./styles";
+import { ShippingContext, CartContext, UserContext } from "../../../context";
+import { ENDPOINTS, post, get } from "../../../api";
 
-export const ShippingInfo = () => {
+export const ShippingInfo = ({ route }) => {
+  const { cartData, product, quantities, selectedSizes, selectedQuantity, customer } = route.params || {};
+
   const { width } = Dimensions.get("window");
   const isTablet = width > 768;
 
   const [showTermsModal, setShowTermsModal] = useState(false);
 
+  const { shippingDetails, setShippingDetails } = useContext(ShippingContext);
+  const { cart } = useContext(CartContext);
+  console.log("cart", JSON.stringify(cart, null, 2))
+  const { user } = useContext(UserContext);
   const [shippingInfo, setShippingInfo] = useState({
     selectedTerms: "",
-    shippingStartDate: "07-11-2025",
-    shippingCancelDate: "07-11-2025",
-    companyName: "VENETTINI.COM",
-    streetAddress: "15807 BISCAYNE BLVD",
-    suite: "SUITE 217",
-    city: "NMB",
-    state: "FL",
-    zipCode: "33160",
-    country: "USA",
+    shippingStartDate: "",
+    shippingCancelDate: "",
+    companyName: customer.StoreName,
+    streetAddress: customer.b_address1 || customer.b_address2 || customer.s_address1 || customer.s_address2,
+    suite: "",
+    city: customer.b_city || customer.s_city,
+    state: customer.b_state || customer.s_state,
+    zipCode: customer.b_postcode || customer.s_postcode,
+    country: customer.b_country || customer.s_country,
   });
 
-  // Sample terms options
   const termsOptions = [
     "Pre-Paid Factor",
     "30% DEP./PREPAY BAL",
@@ -49,15 +56,37 @@ export const ShippingInfo = () => {
   ];
 
   const updateField = (field, value) => {
-    setShippingInfo((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setShippingInfo((prev) => {
+      const updatedInfo = {
+        ...prev,
+        [field]: value,
+      };
+
+      if (field === "shippingStartDate" && value) {
+        try {
+          const [month, day, year] = value.split("-");
+          if (month && day && year) {
+            const startDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+            const cancelDate = new Date(startDate);
+            cancelDate.setDate(cancelDate.getDate() + 30);
+
+            const cancelMonth = String(cancelDate.getMonth() + 1).padStart(2, '0');
+            const cancelDay = String(cancelDate.getDate()).padStart(2, '0');
+            const cancelYear = cancelDate.getFullYear();
+
+            updatedInfo.shippingCancelDate = `${cancelMonth}-${cancelDay}-${cancelYear}`;
+          }
+        } catch (error) {
+          console.log("Error calculating cancel date:", error);
+        }
+      }
+
+      return updatedInfo;
+    });
   };
 
   const formatDisplayDate = (dateString) => {
     try {
-      // Parse MM-DD-YYYY format
       const [month, day, year] = dateString.split("-");
       const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
       return date.toLocaleDateString("en-US", {
@@ -75,21 +104,80 @@ export const ShippingInfo = () => {
     setShowTermsModal(false);
   };
 
-  const handleNext = () => {
-    // Basic validation
+  const handleNext = async () => {
     if (!shippingInfo.selectedTerms) {
       Alert.alert("Validation Error", "Please select payment terms");
       return;
     }
 
-    if (!shippingInfo.companyName || !shippingInfo.streetAddress || !shippingInfo.city) {
+    if (!shippingInfo.companyName || !shippingInfo.streetAddress || !shippingInfo.city || !shippingInfo.state || !shippingInfo.zipCode || !shippingInfo.country || !shippingInfo.shippingStartDate || !shippingInfo.shippingCancelDate) {
       Alert.alert("Validation Error", "Please fill in all required address fields");
       return;
     }
 
-    console.log("Shipping info:", shippingInfo);
-    // Simulate navigation or action without props
-    Alert.alert("Success", "Shipping information submitted!");
+    try {
+      const orderPayload = {
+        orders: cart.productData.shoe1.map(item => ({
+          storeName: cart.customer.StoreName,
+          agentEmail: user.email || "agent@example.com",
+          customerName: `${cart.customer.firstname} ${cart.customer.lastname}`,
+          customerId: cart.customer.customerid,
+          sku: cart.product.productCode,
+          date: shippingInfo.shippingStartDate,
+          Material1: cart.product.materials && cart.product.materials.length > 0 ? cart.product.materials[0] : cart.product.description,
+          Material2: cart.product.materials && cart.product.materials.length > 1 ? cart.product.materials[1] : "",
+          Material3: cart.product.materials && cart.product.materials.length > 2 ? cart.product.materials[2] : "",
+          location1: cart.product.locations && cart.product.locations.length > 0 ? cart.product.locations[0] : "Upper",
+          location2: cart.product.locations && cart.product.locations.length > 1 ? cart.product.locations[1] : "Sole",
+          location3: cart.product.locations && cart.product.locations.length > 2 ? cart.product.locations[2] : "Lining",
+          size: item.size.toString(),
+          unitQuantity: item.quantity,
+          unitFinalPrice: item.price,
+          totalPrice: item.price * item.quantity,
+          sales: item.price * item.quantity,
+          status: "pending",
+          brand: cart.product.brand || "Kinderland",
+          styleName: cart.product.productName,
+          styleFactory: cart.product.styleFactory || cart.product.factory ? `Factory ${cart.product.factory}` : "Factory A",
+          shipTo: shippingInfo.companyName,
+          shipTo_street: shippingInfo.streetAddress,
+          shipTo_street2: shippingInfo.suite,
+          shipTo_city: shippingInfo.city,
+          shipTo_state: shippingInfo.state,
+          shipTo_postcode: shippingInfo.zipCode,
+          shipTo_country: shippingInfo.country,
+          bow: "Standard",
+          stitch: cart.product.stitch || "Double Stitch",
+          outsoleType: cart.product.outsoleType || "Rubber",
+          outsoleColor: cart.product.outsoleColor || "Black",
+          orderNotes: `Payment Terms: ${shippingInfo.selectedTerms}, Shipping Start: ${shippingInfo.shippingStartDate}, Cancel Date: ${shippingInfo.shippingCancelDate}${cart.product.notes ? `, Product Notes: ${cart.product.notes}` : ""}`
+        }))
+      };
+
+      console.log("Order payload:", JSON.stringify(orderPayload, null, 2));
+
+      const response = await post(ENDPOINTS.CREATE_ORDER, orderPayload);
+      console.log("Response:", JSON.stringify(response, null, 2));
+
+      if (response.message?.includes('successfully') || response.order_number) {
+        Alert.alert("Success", `Order created successfully! Order #${response.order_number}`);
+        setShippingDetails(shippingInfo);
+      } else if (response.error || response.status === 'error') {
+        Alert.alert("Error", response.message || response.error || "Failed to create order");
+      } else {
+        Alert.alert("Success", "Order created successfully!");
+        setShippingDetails(shippingInfo);
+      }
+    } catch (error) {
+      console.error("Error creating order:", error);
+
+      if (error.message && error.message.includes('successfully')) {
+        Alert.alert("Success", "Order created successfully!");
+        setShippingDetails(shippingInfo);
+      } else {
+        Alert.alert("Error", error.message || "Failed to create order. Please try again.");
+      }
+    }
   };
 
   const renderTextInput = (value, onChangeText, placeholder, style, keyboardType = "default") => (
@@ -124,7 +212,6 @@ export const ShippingInfo = () => {
     <View style={[styles.container, isTablet && styles.containerTablet]}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={[styles.content, isTablet && styles.contentTablet]}>
-          {/* Terms Dropdown */}
           <View style={[styles.fieldSection, isTablet && styles.fieldSectionTablet]}>
             <TouchableOpacity
               style={[styles.dropdown, isTablet && styles.dropdownTablet]}
@@ -143,27 +230,22 @@ export const ShippingInfo = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Shipping Start Date */}
           {renderDateField("Shipping Start Date", shippingInfo.shippingStartDate, (text) =>
             updateField("shippingStartDate", text)
           )}
 
-          {/* Shipping Cancel Date */}
           {renderDateField("Shipping Cancel Date", shippingInfo.shippingCancelDate, (text) =>
             updateField("shippingCancelDate", text)
           )}
 
-          {/* Shipping Address */}
           <View style={[styles.addressSection, isTablet && styles.addressSectionTablet]}>
             <Text style={[styles.fieldLabel, isTablet && styles.fieldLabelTablet]}>Shipping Address</Text>
 
-            {/* Company Name */}
             {renderTextInput(shippingInfo.companyName, (text) => updateField("companyName", text), "Company Name", [
               styles.fullWidth,
               isTablet && styles.fullWidthTablet,
             ])}
 
-            {/* Street Address */}
             {renderTextInput(
               shippingInfo.streetAddress,
               (text) => updateField("streetAddress", text),
@@ -171,13 +253,11 @@ export const ShippingInfo = () => {
               [styles.fullWidth, isTablet && styles.fullWidthTablet]
             )}
 
-            {/* Suite */}
             {renderTextInput(shippingInfo.suite, (text) => updateField("suite", text), "Suite/Unit", [
               styles.fullWidth,
               isTablet && styles.fullWidthTablet,
             ])}
 
-            {/* City, State, Zip, Country Row */}
             <View style={[styles.addressRow, isTablet && styles.addressRowTablet]}>
               <View style={[styles.quarterWidth, isTablet && styles.quarterWidthTablet]}>
                 {renderTextInput(shippingInfo.city, (text) => updateField("city", text), "City")}
@@ -196,14 +276,12 @@ export const ShippingInfo = () => {
         </View>
       </ScrollView>
 
-      {/* Next Button */}
       <View style={[styles.buttonContainer, isTablet && styles.buttonContainerTablet]}>
         <TouchableOpacity style={[styles.nextButton, isTablet && styles.nextButtonTablet]} onPress={handleNext}>
           <Text style={[styles.nextButtonText, isTablet && styles.nextButtonTextTablet]}>Next</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Terms Selection Modal */}
       <Modal visible={showTermsModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, isTablet && styles.modalContentTablet]}>

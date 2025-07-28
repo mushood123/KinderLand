@@ -6,20 +6,62 @@ import {
   ScrollView,
   StyleSheet,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SizeCard } from '../../../components';
 import { styles } from './styles';
-import { sizeData, quantityButtons } from './data';
+import { quantityButtons } from './data';
+import { useRoute } from '@react-navigation/native';
 
-export const ProductTotal = ({ route }) => {
+export const ProductTotal = () => {
   const [quantities, setQuantities] = useState({
 
   });
   const [selectedSizes, setSelectedSizes] = useState(new Set());
   const [selectedQuantity, setSelectedQuantity] = useState(null);
   const navigation = useNavigation();
-  const { product } = route.params;
+  const route = useRoute();
+  const { product, customer } = route.params;
+  console.log("product from product total", product)
+  console.log("customer from product total", customer)
+
+  // Generate size data dynamically from product size ranges
+  const generateSizeData = () => {
+    const sizeData = [];
+
+    // Parse size range 1 (e.g., "19-27")
+    if (product.pricing.sizeRange1) {
+      const [start1, end1] = product.pricing.sizeRange1.split('-').map(Number);
+      for (let size = start1; size <= end1; size++) {
+        sizeData.push({
+          size: size,
+          model: product.productName || 'N/A',
+          color: product.outsoleColor + " " + product.outsoleType || 'N/A',
+          price: product.pricing.price1 || 0,
+          quantity: 0
+        });
+      }
+    }
+
+    // Parse size range 2 (e.g., "28-41")
+    if (product.pricing.sizeRange2) {
+      const [start2, end2] = product.pricing.sizeRange2.split('-').map(Number);
+      for (let size = start2; size <= end2; size++) {
+        sizeData.push({
+          size: size,
+          model: product.productName || 'N/A',
+          color: product.outsoleColor + " " + product.outsoleType || 'N/A',
+          price: product.pricing.price2 || 0,
+          quantity: 0
+        });
+      }
+    }
+
+    return sizeData;
+  };
+
+  const sizeData = generateSizeData();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -129,7 +171,24 @@ export const ProductTotal = ({ route }) => {
     console.log('Current quantities:', quantities);
     console.log('Selected sizes:', Array.from(selectedSizes));
     console.log('Selected quantity:', selectedQuantity);
-    navigation.navigate('Order Cart', { product: product, quantities: quantities, selectedSizes: selectedSizes, selectedQuantity: selectedQuantity });
+
+    // Check if any sizes and quantities are selected
+    const totalPairs = getTotalPairs();
+    if (totalPairs === 0 || selectedSizes.size === 0) {
+      Alert.alert(
+        'Selection Required',
+        'Please select sizes and quantities before moving to shipping.',
+        [
+          {
+            text: 'OK',
+            style: 'default'
+          }
+        ]
+      );
+      return;
+    }
+
+    navigation.navigate('Order Cart', { product: product, quantities: quantities, selectedSizes: selectedSizes, selectedQuantity: selectedQuantity, customer: customer });
   };
 
   const getInstructionText = () => {

@@ -180,7 +180,7 @@ export const EditCustomer = () => {
       Alert.alert("Success", "Customer information has been updated successfully!");
 
     } catch (error) {
-      console.error("Error updating customer:", error);
+      console.log("Error updating customer:", error);
       Alert.alert("Error", error.message || "Failed to update customer. Please try again.");
     }
   };
