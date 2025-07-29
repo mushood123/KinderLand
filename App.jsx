@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 function AppContent() {
   const [token, setToken] = useState(null);
   const [renderKey, setRenderKey] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const { clearUser } = useContext(UserContext);
 
   const checkToken = async () => {
@@ -29,6 +30,8 @@ function AppContent() {
     } catch (error) {
       console.log('Error fetching token:', error);
       setToken(null);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -80,6 +83,16 @@ function AppContent() {
   console.log('Token truthy check:', !!token);
   console.log('handleLogout function created:', typeof handleLogout);
   console.log('About to render navigation with token:', token, 'and handleLogout:', typeof handleLogout);
+
+  if (isLoading) {
+    return (
+      <GestureHandlerRootView
+        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+      >
+        <StatusBar hidden={true} />
+      </GestureHandlerRootView>
+    );
+  }
 
   return (
     <LogoutProvider handleLogout={handleLogout}>

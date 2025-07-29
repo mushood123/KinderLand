@@ -1,20 +1,21 @@
-import { OrderCard } from "./orderCard";
-import { OrderUpdateModal } from "./orderUpdateModal";
-import { DeleteConfirmationModal } from "./deleteConfirmationModal";
-import { ProductCard } from "./productCard";
-import { FilterModal } from "./filterModal";
-import { SizeCard } from "./sizeCard";
-import { Header } from "./header";
-import { NotificationCard } from "./notificationCard";
-import { ViewNotificationModal } from "./viewNotificationModal";
-import { CustomerCard } from "./customerCard";
-import { SearchBar } from "./searchBar";
-import { ToolBar } from "./toolBar";
-import { EditCustomerCard } from "./editCustomerCard";
-import { OrderHistoryCard } from "./orderHistoryCard";
-import { ProductDetailCard } from "./productDetailCard";
-import { ProductInventoryCard } from "./productInventoryCard";
-import { CartSummaryCard } from "./cartSummaryCard";
+import { OrderCard } from './orderCard';
+import { OrderUpdateModal } from './orderUpdateModal';
+import { DeleteConfirmationModal } from './deleteConfirmationModal';
+import { ProductCard } from './productCard';
+import { FilterModal } from './filterModal';
+import { SizeCard } from './sizeCard';
+import { Header } from './header';
+import { NotificationCard } from './notificationCard';
+import { ViewNotificationModal } from './viewNotificationModal';
+import { CustomerCard } from './customerCard';
+import { SearchBar } from './searchBar';
+import { ToolBar } from './toolBar';
+import { EditCustomerCard } from './editCustomerCard';
+import { OrderHistoryCard } from './orderHistoryCard';
+import { ProductDetailCard } from './productDetailCard';
+import { ProductInventoryCard } from './productInventoryCard';
+import { CartSummaryCard } from './cartSummaryCard';
+import { SignatureCapture } from './signatureCapture';
 
 export {
   OrderCard,
@@ -33,5 +34,6 @@ export {
   OrderHistoryCard,
   ProductDetailCard,
   ProductInventoryCard,
-  CartSummaryCard
+  CartSummaryCard,
+  SignatureCapture,
 };

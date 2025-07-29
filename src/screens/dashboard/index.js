@@ -17,12 +17,18 @@ import { CreateCustomer } from './createCustomer';
 import { SelectProduct } from './selectProduct';
 import { ProductTotal } from './productTotal';
 import { OrderCart } from './orderCart';
-import { SVGCustomers, SVGHome, SVGProducts, SVGReports, SVGAdd } from '../../assets';
+import { DigitalSignature } from './digitalSignature';
+import {
+  SVGCustomers,
+  SVGHome,
+  SVGProducts,
+  SVGReports,
+  SVGAdd,
+} from '../../assets';
 import { ShippingInfo } from './shippingInfo';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-
 
 const ProfileWrapper = React.memo(() => {
   console.log('ProfileWrapper rendered');
@@ -37,26 +43,30 @@ const HomeStack = () => {
         name="Home"
         component={Home}
         options={{
-          headerShown: false
-        }} />
+          headerShown: false,
+        }}
+      />
       <Stack.Screen
         name="Edit Order"
         component={EditOrder}
         options={{
-          headerShown: true
-        }} />
+          headerShown: true,
+        }}
+      />
       <Stack.Screen
         name="Size Quantity"
         component={SizeQuantity}
         options={{
-          headerShown: true
-        }} />
+          headerShown: true,
+        }}
+      />
       <Stack.Screen
         name="Notifications"
         component={Notifications}
         options={{
-          headerShown: true
-        }} />
+          headerShown: true,
+        }}
+      />
       <Stack.Screen
         name="Profile"
         component={ProfileWrapper}
@@ -67,7 +77,7 @@ const HomeStack = () => {
       />
     </Stack.Navigator>
   );
-}
+};
 
 const CustomerStack = () => {
   return (
@@ -77,7 +87,7 @@ const CustomerStack = () => {
         component={Customers}
         options={{
           headerShown: true,
-          headerLeft: () => null
+          headerLeft: () => null,
         }}
       />
       <Stack.Screen
@@ -112,49 +122,56 @@ const OrderStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name='Add Order'
+        name="Add Order"
         component={AddOrder}
         options={{
           headerLeft: () => null,
           headerShown: true,
-          title: 'New Order'
+          title: 'New Order',
         }}
       />
       <Stack.Screen
-        name='Select Product'
+        name="Select Product"
         component={SelectProduct}
         options={{
           headerShown: true,
-          title: 'Select Product'
+          title: 'Select Product',
         }}
       />
       <Stack.Screen
-        name='Product Total'
+        name="Product Total"
         component={ProductTotal}
         options={{
           headerShown: true,
-          title: 'Product Total'
+          title: 'Product Total',
         }}
       />
       <Stack.Screen
-        name='Order Cart'
+        name="Order Cart"
         component={OrderCart}
         options={{
           headerShown: true,
-          title: 'Cart'
+          title: 'Cart',
         }}
       />
       <Stack.Screen
-        name='Shipping Info'
+        name="Shipping Info"
         component={ShippingInfo}
         options={{
           headerShown: true,
-          title: 'Shipping Info'
+          title: 'Shipping Info',
+        }}
+      />
+      <Stack.Screen
+        name="Digital Signature"
+        component={DigitalSignature}
+        options={{
+          headerShown: false,
         }}
       />
     </Stack.Navigator>
-  )
-}
+  );
+};
 
 const HomeStackWrapper = React.memo(() => {
   console.log('HomeStackWrapper rendered');
@@ -188,13 +205,13 @@ export const Dashboard = ({ route }) => {
         options={{
           headerShown: false,
           tabBarIcon: ({ focused }) => <SVGAdd size="30px" />,
-
         }}
       />
       <Tab.Screen
         name="Reports"
         component={Reports}
         options={{
+          headerShown: true,
           tabBarIcon: ({ focused }) => <SVGReports size="30px" />,
         }}
       />
@@ -206,5 +223,5 @@ export const Dashboard = ({ route }) => {
         }}
       />
     </Tab.Navigator>
-  )
-}
+  );
+};

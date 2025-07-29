@@ -1,42 +1,43 @@
-import React, { useContext } from "react"
-import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native"
-import { useRoute, useNavigation } from "@react-navigation/native"
-import { styles } from "./styles"
-import { ProductInventoryCard, CartSummaryCard } from "../../../components"
-import { CartContext } from "../../../context"
+import React, { useContext } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import { styles } from './styles';
+import { ProductInventoryCard, CartSummaryCard } from '../../../components';
+import { CartContext } from '../../../context';
 
 export const OrderCart = () => {
-  const route = useRoute()
-  const navigation = useNavigation()
-  const { cart, setCart } = useContext(CartContext)
-  const { product, quantities, selectedSizes, selectedQuantity, customer } = route.params || {}
-  console.log("Product", product)
-  console.log("Quantities", quantities)
-  console.log("Selected Sizes", selectedSizes)
-  console.log("Selected Quantity", selectedQuantity)
-  console.log("Customer", customer)
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { cart, setCart } = useContext(CartContext);
+  const { product, quantities, selectedSizes, selectedQuantity, customer } = route.params || {};
+
+  console.log('Product', product);
+  console.log('Quantities', quantities);
+  console.log('Selected Sizes', selectedSizes);
+  console.log('Selected Quantity', selectedQuantity);
+  console.log('Customer', customer);
 
   const transformProductData = () => {
-    if (!product || !quantities) return []
+    if (!product || !quantities) return [];
 
     const sizeQuantities = Object.entries(quantities).map(([size, quantity]) => ({
       size: parseInt(size),
       quantity: quantity
-    })).filter(item => item.quantity > 0)
+    })).filter(item => item.quantity > 0);
 
-    const priceTiers = []
+    const priceTiers = [];
     if (product.pricing) {
       if (product.pricing.sizeRange1 && product.pricing.price1) {
         priceTiers.push({
           sizeRange: product.pricing.sizeRange1,
           price: parseFloat(product.pricing.price1.replace('$', ''))
-        })
+        });
       }
       if (product.pricing.sizeRange2 && product.pricing.price2) {
         priceTiers.push({
           sizeRange: product.pricing.sizeRange2,
           price: parseFloat(product.pricing.price2.replace('$', ''))
-        })
+        });
       }
     }
 
@@ -47,72 +48,88 @@ export const OrderCart = () => {
       imageUrl: product.imageUrl,
       sizeQuantities: sizeQuantities,
       priceTiers: priceTiers
-    }]
-  }
+    }];
+  };
 
-  const cartProducts = transformProductData()
+  const cartProducts = transformProductData();
 
   const calculateCartTotals = () => {
-    let totalPairs = 0
-    let totalValue = 0
+    let totalPairs = 0;
+    let totalValue = 0;
 
-    cartProducts.forEach((product) => {
-      product.sizeQuantities.forEach((sizeQty) => {
-        totalPairs += sizeQty.quantity
+    cartProducts.forEach(product => {
+      product.sizeQuantities.forEach(sizeQty => {
+        totalPairs += sizeQty.quantity;
 
-        const tier = product.priceTiers.find((tier) => {
-          const [min, max] = tier.sizeRange.split("-").map((s) => Number.parseInt(s.trim()))
-          return sizeQty.size >= min && sizeQty.size <= max
-        })
+        const tier = product.priceTiers.find(tier => {
+          const [min, max] = tier.sizeRange
+            .split('-')
+            .map(s => Number.parseInt(s.trim()));
+          return sizeQty.size >= min && sizeQty.size <= max;
+        });
 
         if (tier) {
-          totalValue += sizeQty.quantity * tier.price
+          totalValue += sizeQty.quantity * tier.price;
         }
-      })
-    })
+      });
+    });
 
-    return { totalPairs, totalValue }
-  }
+    return { totalPairs, totalValue };
+  };
 
-  const { totalPairs, totalValue } = calculateCartTotals()
+  const { totalPairs, totalValue } = calculateCartTotals();
 
-  const handleDeleteProduct = (productName) => {
-    console.log("Delete product:", productName)
-    Alert.alert("Delete Product", `Are you sure you want to remove ${productName} from the cart?`, [
-      { text: "Cancel", style: "cancel" },
-      { text: "Delete", style: "destructive", onPress: () => console.log("Product deleted") },
-    ])
-  }
+  const handleDeleteProduct = productName => {
+    console.log('Delete product:', productName);
+    Alert.alert(
+      'Delete Product',
+      `Are you sure you want to remove ${productName} from the cart?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => console.log('Product deleted'),
+        },
+      ],
+    );
+  };
 
   const handleQuantityChange = (productName, size, quantity) => {
-    console.log(`Product: ${productName}, Size: ${size}, Quantity changed to:`, quantity)
-  }
+    console.log(
+      `Product: ${productName}, Size: ${size}, Quantity changed to:`,
+      quantity,
+    );
+  };
 
-  const handleCardPress = (productName) => {
-    console.log("Product inventory card pressed:", productName)
-  }
+  const handleCardPress = productName => {
+    console.log('Product inventory card pressed:', productName);
+  };
 
   const handleNextPress = () => {
-    console.log("Proceeding to next step with cart totals:", { totalPairs, totalValue })
+    console.log('Proceeding to next step with cart totals:', {
+      totalPairs,
+      totalValue,
+    });
 
-    const productData = {}
+    const productData = {};
 
     cartProducts.forEach((product, index) => {
-      const productKey = `shoe${index + 1}`
+      const productKey = `shoe${index + 1}`;
 
       productData[productKey] = product.sizeQuantities.map((sizeQty) => {
         const tier = product.priceTiers.find((tier) => {
-          const [min, max] = tier.sizeRange.split("-").map((s) => Number.parseInt(s.trim()))
-          return sizeQty.size >= min && sizeQty.size <= max
-        })
+          const [min, max] = tier.sizeRange.split("-").map((s) => Number.parseInt(s.trim()));
+          return sizeQty.size >= min && sizeQty.size <= max;
+        });
 
         return {
           size: sizeQty.size,
           quantity: sizeQty.quantity,
           price: tier ? tier.price : 0
-        }
-      })
-    })
+        };
+      });
+    });
 
     const cartData = {
       products: cartProducts,
@@ -120,13 +137,22 @@ export const OrderCart = () => {
       customer: customer,
       productData: productData,
       product: product,
-    }
-    setCart(cartData)
+    };
+    setCart(cartData);
 
-    Alert.alert("Next Step", "Proceeding to checkout or next screen", [
-      { text: "OK", onPress: () => { navigation.navigate("Shipping Info", { cartData, product, quantities, selectedSizes, selectedQuantity, customer }) } },
-    ])
-  }
+    // Generate a realistic order number
+    const orderNumber = Math.floor(Math.random() * 9000) + 1000; // 4-digit number
+
+    navigation.navigate('Digital Signature', {
+      orderId: orderNumber.toString(),
+      cartData,
+      product,
+      quantities,
+      selectedSizes,
+      selectedQuantity,
+      customer
+    });
+  };
 
   if (cartProducts.length === 0) {
     return (
@@ -136,15 +162,20 @@ export const OrderCart = () => {
           <Text style={styles.headerSubtitle}>No items in cart</Text>
         </View>
       </View>
-    )
+    );
   }
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.headerSection}>
           <Text style={styles.headerTitle}>Selected Items</Text>
-          <Text style={styles.headerSubtitle}>These items are currently added into order.</Text>
+          <Text style={styles.headerSubtitle}>
+            These items are currently added into order.
+          </Text>
         </View>
 
         <View style={styles.itemsSection}>
@@ -160,7 +191,9 @@ export const OrderCart = () => {
               sizeQuantities={product.sizeQuantities}
               priceTiers={product.priceTiers}
               onDeletePress={() => handleDeleteProduct(product.productName)}
-              onQuantityChange={(size, quantity) => handleQuantityChange(product.productName, size, quantity)}
+              onQuantityChange={(size, quantity) =>
+                handleQuantityChange(product.productName, size, quantity)
+              }
               onCardPress={() => handleCardPress(product.productName)}
             />
           ))}
@@ -168,15 +201,24 @@ export const OrderCart = () => {
 
         <View style={styles.summarySection}>
           <Text style={styles.sectionTitle}>Summary</Text>
-          <CartSummaryCard unitTotal={totalPairs} unitLabel="pairs" grandTotal={totalValue} currency="$" />
+          <CartSummaryCard
+            unitTotal={totalPairs}
+            unitLabel="pairs"
+            grandTotal={totalValue}
+            currency="$"
+          />
         </View>
       </ScrollView>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.nextButton} onPress={handleNextPress} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={styles.nextButton}
+          onPress={handleNextPress}
+          activeOpacity={0.8}
+        >
           <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
     </View>
-  )
-}
+  );
+};

@@ -1,3 +1,5 @@
+import { AllStyleSold } from '../screens/dashboard/reports/allStyleSold';
+
 export const ENDPOINTS = {
   LOGIN: '/employee-login',
   HISTORY_ORDERS: '/order-history-admin',
@@ -9,4 +11,14 @@ export const ENDPOINTS = {
   DELETE_ORDER: '/delete-order',
   GET_ORDER_DETAILS: '/get-order-details',
   CREATE_ORDER: '/create-order',
+  ALL_STYLE_SOLD: '/all-styles-sold-report',
+  TOTAL_SALES_BY_DATE: '/sales-by-date-report',
+  SALES_REPORT: '/sales-report',
+  TOTAL_SALES_BY_STORE_NAME: '/sales-by-storename-report',
+  STORE_ORDER_STATUS: '/customer-order-status-report',
+  FACTORY_STYLE_BY_STORE_NAME: '/factory-style-customer-report',
+  GET_TOKEN: '/get-token',
+  UPLOAD_SIGNATURE: '/upload-sign-img/:order_number',
+  GET_EMPLOYEE_NOTIFICATION: '/get-employee-notification',
+  UPDATE_NOTIFICATION_STATUS: '/update-notification-status',
 };

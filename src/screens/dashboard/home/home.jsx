@@ -14,18 +14,19 @@ export const Home = () => {
   const navigation = useNavigation();
   const { user } = useContext(UserContext);
   const [orders, setOrders] = useState([]);
-  const handleEdit = (item) => {
+
+  const handleEdit = item => {
     console.log(`Edit order ${item.poNumber}`);
     setSelectedOrder(item);
-    console.log('order data', item)
+    console.log('order data', item);
     navigation.navigate('Edit Order');
   };
 
-  const handleDelete = (item) => {
+  const handleDelete = item => {
     console.log(`Delete order ${item.poNumber}`);
     setDeleteModalVisible(true);
     setSelectedOrder(item);
-  }
+  };
 
   const handleNotificationPress = () => {
     console.log('Notification pressed');
@@ -38,19 +39,19 @@ export const Home = () => {
   };
 
   const getOrders = async () => {
-    const res = await get(ENDPOINTS.HISTORY_ORDERS);
+    const res = await get(ENDPOINTS.HISTORY_ORDERS, {});
     console.log('orders', res);
     setOrders(res);
-  }
+  };
 
   useEffect(() => {
     getOrders();
   }, []);
-
+  console.log('orders >>> ', orders);
   return (
     <>
       <Header
-        userName={user?.name}
+        userName={user?.firstname || 'User'}
         notificationCount={10}
         onNotificationPress={handleNotificationPress}
         onProfilePress={handleProfilePress}
@@ -59,7 +60,7 @@ export const Home = () => {
       <FlatList
         contentContainerStyle={styles.container}
         data={orders}
-        keyExtractor={(item) => item.poNumber}
+        keyExtractor={item => item.poNumber}
         renderItem={({ item }) => (
           <OrderCard
             poNumber={item.orderNumber}
