@@ -14,8 +14,10 @@ import {
 import { styles } from "./styles";
 import { ShippingContext, CartContext, UserContext } from "../../../context";
 import { ENDPOINTS, post, get } from "../../../api";
+import { useNavigation } from "@react-navigation/native";
 
 export const ShippingInfo = ({ route }) => {
+  const navigation = useNavigation();
   const { cartData, product, quantities, selectedSizes, selectedQuantity, customer } = route.params || {};
 
   const { width } = Dimensions.get("window");
@@ -39,6 +41,7 @@ export const ShippingInfo = ({ route }) => {
     zipCode: customer.b_postcode || customer.s_postcode,
     country: customer.b_country || customer.s_country,
   });
+  const [orderId, setOrderId] = useState(null);
 
   const termsOptions = [
     "Pre-Paid Factor",
@@ -160,8 +163,13 @@ export const ShippingInfo = ({ route }) => {
       console.log("Response:", JSON.stringify(response, null, 2));
 
       if (response.message?.includes('successfully') || response.order_number) {
+        setOrderId(response.order_number);
         Alert.alert("Success", `Order created successfully! Order #${response.order_number}`);
+        navigation.navigate('Digital Signature', {
+          orderId: response.order_number,
+        });
         setShippingDetails(shippingInfo);
+        return;
       } else if (response.error || response.status === 'error') {
         Alert.alert("Error", response.message || response.error || "Failed to create order");
       } else {

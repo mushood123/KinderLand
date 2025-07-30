@@ -80,10 +80,9 @@ export const StoreOrderStatus = () => {
 
   useEffect(() => {
     fetchTotalSales();
-    // Remove automatic fetching - now controlled by search button
   }, []);
-
-  let filteredData = customers.filter(item => {
+  console.log('customers', customers);
+  let filteredData = customers.length > 0 && customers?.filter(item => {
     if (filter === '') return true;
     return (
       item.storeName &&
@@ -91,8 +90,7 @@ export const StoreOrderStatus = () => {
     );
   });
 
-  // Sort by Store Name
-  filteredData = filteredData.sort((a, b) => {
+  filteredData = filteredData.length > 0 && filteredData.sort((a, b) => {
     if (!a.storeName || !b.storeName) return 0;
     return sortAsc
       ? a.storeName.localeCompare(b.storeName)
@@ -134,13 +132,10 @@ export const StoreOrderStatus = () => {
     );
   }
 
-  // Since we now have default dates, we don't need this condition anymore
-
   const isFilteredData = filteredData.length === 0 && !loading;
 
   return (
     <View style={styles.container}>
-      {/* Date Input Fields - Matching the UI design */}
       <View
         style={{
           flexDirection: 'row',
@@ -206,7 +201,6 @@ export const StoreOrderStatus = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Sort Dropdown */}
         <View style={{ marginLeft: 8 }}>
           <Text
             style={{
@@ -240,7 +234,6 @@ export const StoreOrderStatus = () => {
         </View>
       </View>
 
-      {/* Search Bar */}
       <View
         style={{
           flexDirection: 'row',
@@ -268,7 +261,6 @@ export const StoreOrderStatus = () => {
         />
       </View>
 
-      {/* Search Button */}
       <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
         <TouchableOpacity
           style={{
@@ -287,7 +279,6 @@ export const StoreOrderStatus = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Date Pickers */}
       <DatePicker
         modal
         open={showStartDatePicker}
@@ -316,7 +307,6 @@ export const StoreOrderStatus = () => {
         }}
       />
 
-      {/* Sort Dropdown Modal */}
       <Modal
         visible={showSortDropdown}
         transparent
@@ -395,11 +385,9 @@ export const StoreOrderStatus = () => {
         data={filteredData}
         keyExtractor={(item, index) => index.toString()}
         renderItem={renderItem}
-        // ListFooterComponent={renderFooter}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
       />
-      {/* {isFilteredData ? null : renderFooter()} */}
       {isFilteredData && (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>No sales data found</Text>

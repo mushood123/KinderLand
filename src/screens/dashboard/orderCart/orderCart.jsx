@@ -140,10 +140,9 @@ export const OrderCart = () => {
     };
     setCart(cartData);
 
-    // Generate a realistic order number
-    const orderNumber = Math.floor(Math.random() * 9000) + 1000; // 4-digit number
+    const orderNumber = Math.floor(Math.random() * 9000) + 1000;
 
-    navigation.navigate('Digital Signature', {
+    navigation.navigate('Shipping Info', {
       orderId: orderNumber.toString(),
       cartData,
       product,

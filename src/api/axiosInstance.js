@@ -2,8 +2,8 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const axiosInstance = axios.create({
-  baseURL: 'https://venettini.app',
-  // 'http://localhost:3004',
+  // baseURL: 'https://venettini.app',
+  baseURL: 'http://localhost:3004',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
