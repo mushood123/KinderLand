@@ -21,4 +21,5 @@ export const ENDPOINTS = {
   UPLOAD_SIGNATURE: '/upload-sign-img/:order_number',
   GET_EMPLOYEE_NOTIFICATION: '/get-employee-notification',
   UPDATE_NOTIFICATION_STATUS: '/update-notification-status',
+  UPLOAD_PDF: '/upload-pdf',
 };

@@ -161,7 +161,7 @@ export const DigitalSignature = ({ route }) => {
         {
           text: 'OK',
           onPress: () => {
-            navigation.navigate('Home');
+            navigation.navigate('Generate PDF', { orderId });
           },
         },
       ]);

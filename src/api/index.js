@@ -1,4 +1,4 @@
 import { ENDPOINTS } from './endpoints.js';
-import { get, post, put, del, uploadFile } from './apiClient.js';
+import { get, post, put, del, uploadFile, uploadPDF } from './apiClient.js';
 
-export { ENDPOINTS, get, post, put, del, uploadFile };
+export { ENDPOINTS, get, post, put, del, uploadFile, uploadPDF };

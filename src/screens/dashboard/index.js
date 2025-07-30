@@ -18,6 +18,7 @@ import { SelectProduct } from './selectProduct';
 import { ProductTotal } from './productTotal';
 import { OrderCart } from './orderCart';
 import { DigitalSignature } from './digitalSignature';
+import { GeneratePdf } from './generatePdf';
 import {
   SVGCustomers,
   SVGHome,
@@ -165,6 +166,13 @@ const OrderStack = () => {
       <Stack.Screen
         name="Digital Signature"
         component={DigitalSignature}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="Generate PDF"
+        component={GeneratePdf}
         options={{
           headerShown: false,
         }}

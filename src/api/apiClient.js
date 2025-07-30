@@ -51,3 +51,33 @@ export const uploadFile = async (url, file, fileName = 'file') => {
     throw error.response?.data || error;
   }
 };
+
+export const uploadPDF = async (url, file, fileName = 'file', orderId) => {
+  try {
+    const formData = new FormData();
+
+    // Handle React Native file object
+    if (file && typeof file === 'object' && file.uri) {
+      formData.append('file', file);
+    } else {
+      // Fallback for string paths (legacy support)
+      formData.append('file', {
+        uri: `file://${file}`,
+        type: 'application/pdf',
+        name: `${fileName}.pdf`,
+      });
+    }
+
+    formData.append('order_number', orderId);
+
+    const res = await axiosInstance.post(url, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return res.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
